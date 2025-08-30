@@ -151,7 +151,6 @@
     const sendButton = document.getElementById('send-button');
 
     // 대화 내역을 저장하는 배열. 시스템 메시지로 혜숙이의 페르소나를 설정합니다.
-    // 이 배열은 페이지가 새로고침되면 초기화됩니다.
     let chatHistory = [
         {
             role: "system",
@@ -183,21 +182,25 @@
         chatHistory.push({ role: "user", content: userMessage });
         
         try {
+            const apiPayload = {
+                // 모델명은 워커가 아닌 프론트엔드에서 보냅니다.
+                model: "deepseek-chat",
+                messages: chatHistory
+            };
+
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    messages: chatHistory
-                })
+                body: JSON.stringify(apiPayload)
             });
 
             if (!response.ok) {
                 // HTTP 오류 시, 오류 메시지를 표시
                 const errorData = await response.json();
                 console.error('API Error:', errorData);
-                appendMessage("죄송합니다. API 호출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.", 'hyesuk');
+                appendMessage(`죄송합니다. API 호출 중 오류가 발생했습니다. (오류 코드: ${response.status}) 잠시 후 다시 시도해주세요.`, 'hyesuk');
                 return;
             }
 
