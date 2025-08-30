@@ -3,241 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>혜숙이의 상담소</title>
+    <title>AI 상담사 혜숙이</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
-        
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #9bbbd4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .chat-container-main {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            max-width: 600px;
-            height: 85vh;
-            background-color: #f7f7f7;
-            border-radius: 1rem;
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .chat-header {
-            background-color: #639cb8;
-            color: white;
-            padding: 1rem;
-            text-align: center;
-            font-size: 1.25rem;
-            font-weight: bold;
-        }
-
-        #chat-window {
-            flex-grow: 1;
-            padding: 1rem;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        /* 스크롤바 디자인 */
-        #chat-window::-webkit-scrollbar {
+        /* 커스텀 스크롤바 (선택 사항) */
+        #chat-container::-webkit-scrollbar {
             width: 8px;
         }
-        #chat-window::-webkit-scrollbar-thumb {
-            background-color: #aaa;
+        #chat-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        #chat-container::-webkit-scrollbar-thumb {
+            background: #888;
             border-radius: 4px;
         }
-        #chat-window::-webkit-scrollbar-track {
-            background-color: #f1f1f1;
-        }
-
-        .chat-bubble {
-            max-width: 80%;
-            padding: 0.75rem 1rem;
-            border-radius: 1rem;
-            word-wrap: break-word;
-            line-height: 1.4;
-            position: relative;
-        }
-
-        .user-bubble {
-            background-color: #FFCD50;
-            align-self: flex-end;
-            margin-right: 0;
-            border-top-right-radius: 0.25rem;
-        }
-
-        .hyesuk-bubble {
-            background-color: #FFFFFF;
-            align-self: flex-start;
-            margin-left: 0;
-            border-top-left-radius: 0.25rem;
-        }
-
-        .input-container {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            background-color: #ffffff;
-            border-top: 1px solid #e5e7eb;
-            position: relative;
-        }
-
-        #message-input {
-            flex-grow: 1;
-            border: none;
-            outline: none;
-            background-color: transparent;
-            font-size: 1rem;
-            padding: 0.5rem;
-            padding-right: 3rem; /* 전송 버튼 공간 확보 */
-        }
-        
-        #send-button {
-            position: absolute;
-            right: 1.5rem;
-            width: 36px;
-            height: 36px;
-            background-color: black;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: background-color 0.2s;
-        }
-
-        #send-button:hover {
-            background-color: #333;
-        }
-        
-        #send-button svg {
-            fill: white;
+        #chat-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
     </style>
 </head>
-<body>
+<body class="bg-[#9bbbd4] font-sans">
 
-<div class="chat-container-main">
-    <div class="chat-header">혜숙이의 상담소</div>
-    <div id="chat-window"></div>
-    <div class="input-container">
-        <input type="text" id="message-input" placeholder="메시지를 입력하세요..." />
-        <div id="send-button">
-            <!-- 하얀색 화살표 SVG -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-            </svg>
+    <div id="app" class="flex flex-col h-screen max-w-3xl mx-auto">
+        <!-- 헤더 -->
+        <header class="bg-white/30 backdrop-blur-sm text-center py-4 shadow-md">
+            <h1 class="text-xl font-bold text-gray-800">AI 상담사 혜숙이</h1>
+            <p class="text-sm text-gray-600">당신의 이야기를 들어줄게요</p>
+        </header>
+
+        <!-- 채팅 메시지 컨테이너 -->
+        <div id="chat-container" class="flex-1 p-4 overflow-y-auto space-y-4">
+            <!-- 초기 메시지 -->
+            <div class="flex justify-start">
+                <div class="bg-white rounded-lg p-3 max-w-xs md:max-w-md shadow">
+                    <p class="text-gray-800">안녕하세요, 혜숙이에요. 어떤 고민이 있으신가요? 편하게 이야기해주세요.</p>
+                </div>
+            </div>
+            <!-- 동적 메시지가 여기에 추가됩니다 -->
         </div>
+
+        <!-- 로딩 인디케이터 -->
+        <div id="loading" class="hidden flex items-center justify-start p-4">
+             <div class="flex items-center space-x-2">
+                <div class="bg-white rounded-lg p-3 shadow flex items-center space-x-2">
+                    <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: -0.3s;"></div>
+                    <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: -0.15s;"></div>
+                    <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 입력창 -->
+        <footer class="p-4 bg-white/30 backdrop-blur-sm">
+            <div class="relative flex items-center">
+                <input type="text" id="user-input" class="w-full bg-white rounded-full py-3 pl-5 pr-14 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner" placeholder="메시지를 입력하세요...">
+                <button id="send-button" class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </button>
+            </div>
+        </footer>
     </div>
-</div>
 
-<script>
-    // API 키 노출을 방지하기 위해 클라우드플레어 워커를 통해 API를 호출합니다.
-    const API_URL = '/api/chat';
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const loadingIndicator = document.getElementById('loading');
 
-    const chatWindow = document.getElementById('chat-window');
-    const messageInput = document.getElementById('message-input');
-    const sendButton = document.getElementById('send-button');
+        // 대화 기록을 저장하는 배열 (페이지 세션 동안 유지)
+        let conversationHistory = [];
 
-    // 대화 내역을 저장하는 배열. 시스템 메시지로 혜숙이의 페르소나를 설정합니다.
-    let chatHistory = [
-        {
-            role: "system",
-            content: "너는 '혜숙이'라는 이름의 전문 상담가이자 친구야. 따뜻하고 진심 어린 말투로 상대방의 고민을 들어주고 위로하며, 진심으로 공감해 줘. 항상 한글로 답변해야 해."
+        // 시스템 메시지: '혜숙이'의 역할 정의
+        const systemMessage = {
+            role: 'system',
+            content: "You are '혜숙이', a professional counselor and a warm-hearted friend. Your role is to listen to the user's concerns, provide comfort, and offer counseling. You must always respond in Korean, using a gentle and empathetic tone. Keep your answers concise and supportive."
+        };
+
+        // UI에 메시지 추가하는 함수
+        function addMessageToChat(message, sender) {
+            const messageWrapper = document.createElement('div');
+            messageWrapper.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+
+            const messageBubble = document.createElement('div');
+            messageBubble.className = `rounded-lg p-3 max-w-xs md:max-w-md shadow ${sender === 'user' ? 'bg-[#FFCD50] text-gray-800' : 'bg-white text-gray-800'}`;
+            messageBubble.innerText = message;
+            
+            messageWrapper.appendChild(messageBubble);
+            chatContainer.appendChild(messageWrapper);
+
+            // 스크롤을 맨 아래로 이동
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
-    ];
 
-    // 첫 인사 메시지 표시
-    appendMessage("안녕하세요. 당신의 고민을 함께 나눌 혜숙이입니다. 편하게 이야기해주세요.", 'hyesuk');
+        // AI 응답을 받아오는 함수
+        async function getAIResponse() {
+            const userMessage = userInput.value.trim();
+            if (userMessage === '') return;
 
-    // 메시지 버블을 생성하고 채팅 창에 추가하는 함수
-    function appendMessage(text, role) {
-        const bubble = document.createElement('div');
-        bubble.classList.add('chat-bubble', 'rounded-2xl', 'max-w-[80%]');
-        if (role === 'user') {
-            bubble.classList.add('user-bubble', 'self-end', 'rounded-tr-md');
-        } else { // role === 'hyesuk'
-            bubble.classList.add('hyesuk-bubble', 'self-start', 'rounded-tl-md');
-        }
-        bubble.textContent = text;
-        chatWindow.appendChild(bubble);
-        // 메시지를 추가한 후 스크롤을 맨 아래로 이동
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-    }
+            addMessageToChat(userMessage, 'user');
+            conversationHistory.push({ role: 'user', content: userMessage });
+            userInput.value = '';
+            loadingIndicator.classList.remove('hidden');
 
-    // 클라우드플레어 워커를 통해 API에 메시지를 보내고 응답을 받는 함수
-    async function sendMessageToAPI(userMessage) {
-        // 사용자 메시지를 대화 기록에 추가
-        chatHistory.push({ role: "user", content: userMessage });
-        
-        try {
-            const apiPayload = {
-                // 모델명은 워커가 아닌 프론트엔드에서 보냅니다.
-                model: "deepseek-chat",
-                messages: chatHistory
-            };
+            try {
+                // Cloudflare Worker를 통해 DeepSeek API를 호출합니다.
+                // 보안을 위해 API 키는 클라이언트 측 코드가 아닌 Worker에 저장되어야 합니다.
+                // 이 HTML 파일이 있는 Cloudflare Pages 프로젝트에 Worker를 연결하고,
+                // 아래 fetch 요청을 처리하도록 설정해야 합니다.
+                const response = await fetch('/api/chat', { // '/api/chat'은 Worker가 응답할 가상 경로입니다.
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model: 'deepseek-chat',
+                        messages: [systemMessage, ...conversationHistory]
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error.message || 'API 호출에 실패했습니다.');
+                }
 
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(apiPayload)
-            });
+                const data = await response.json();
+                const aiMessage = data.choices[0].message.content;
 
-            if (!response.ok) {
-                // HTTP 오류 시, 오류 메시지를 표시
-                const errorData = await response.json();
-                console.error('API Error:', errorData);
-                appendMessage(`죄송합니다. API 호출 중 오류가 발생했습니다. (오류 코드: ${response.status}) 잠시 후 다시 시도해주세요.`, 'hyesuk');
-                return;
+                addMessageToChat(aiMessage, 'ai');
+                conversationHistory.push({ role: 'assistant', content: aiMessage });
+
+            } catch (error) {
+                console.error('Error:', error);
+                addMessageToChat('죄송해요, 지금은 답변을 드릴 수 없어요. 잠시 후 다시 시도해주세요.', 'ai');
+            } finally {
+                loadingIndicator.classList.add('hidden');
             }
-
-            const data = await response.json();
-            const hyesukResponse = data.choices[0].message.content;
-
-            // 혜숙이의 응답을 대화 기록에 추가하고 화면에 표시
-            chatHistory.push({ role: "assistant", content: hyesukResponse });
-            appendMessage(hyesukResponse, 'hyesuk');
-
-        } catch (error) {
-            console.error('Fetch Error:', error);
-            appendMessage("죄송합니다. 네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.", 'hyesuk');
         }
-    }
+        
+        // 이벤트 리스너 설정
+        sendButton.addEventListener('click', getAIResponse);
+        userInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // 기본 엔터 동작(줄바꿈 등) 방지
+                getAIResponse();
+            }
+        });
 
-    // 메시지 전송 처리 함수
-    function handleSendMessage() {
-        const message = messageInput.value.trim();
-        if (message) {
-            appendMessage(message, 'user');
-            sendMessageToAPI(message);
-            messageInput.value = ''; // 입력창 초기화
-        }
-    }
-
-    // 전송 버튼 클릭 시 이벤트 리스너
-    sendButton.addEventListener('click', handleSendMessage);
-
-    // Enter 키 입력 시 이벤트 리스너
-    messageInput.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-            handleSendMessage();
-        }
-    });
-
-</script>
-
+    </script>
 </body>
 </html>
