@@ -48,7 +48,7 @@
           당신의 상담친구 혜숙이
         </a>
       </h1>
-      <p class="text-sm text-gray-600">우측 메뉴를 눌러보세요</p>
+      <p class="text-sm text-gray-600"><b>위로와 행운</p>
 
       <!-- 햄버거 버튼 -->
       <button id="menu-btn" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-white/60 focus:outline-none focus:ring-2 focus:ring-black/40" aria-label="메뉴 열기">
@@ -58,9 +58,27 @@
       </button>
     </header>
 
-    <!-- 공통 본문 컨테이너: 각 페이지는 여기만 수정 -->
+    <!-- 공통 본문 컨테이너 -->
     <main id="content" class="flex-1 p-4">
-      <!-- 페이지별 콘텐츠를 이 영역에 넣으세요 -->
+      <!-- ✅ 랜덤 말풍선 -->
+      <section class="py-6">
+        <div id="quote-bubble" class="relative mx-auto max-w-xl bg-[#fbe300] text-gray-900 rounded-2xl p-5 leading-relaxed shadow">
+          <p id="quote-text" class="text-base font-medium"></p>
+          <!-- 꼬리 -->
+          <span class="absolute -bottom-2 left-8 block w-4 h-4 bg-[#fbe300] rotate-45"></span>
+        </div>
+
+        <!-- ✅ 행운 숫자 섹션 -->
+        <div class="mt-8 text-center">
+          <h3 class="text-sm font-semibold text-gray-800 mb-3">오늘 당신에게 행운의 숫자는</h3>
+          <iframe
+            id="fortune-iframe"
+            title="한국 로또 추첨기"
+            loading="lazy"
+            class="w-full max-w-md mx-auto rounded-xl shadow border border-gray-200 bg-white"
+            style="height: 180px;"></iframe>
+        </div>
+      </section>
     </main>
   </div>
 
@@ -88,7 +106,7 @@
     </nav>
   </aside>
 
-  <!-- 공통 스크립트: 드로어 + 공유만 유지 -->
+  <!-- 공통 스크립트: 드로어 + 공유 + 랜덤 말풍선 + iframe 주입 -->
   <script>
     // === Drawer Toggle ===
     const menuBtn = document.getElementById('menu-btn');
@@ -133,9 +151,176 @@
         }
       });
     }
+
+    // === 100가지 위로/명언 랜덤 표시 ===
+    const QUOTES = [
+`힘들면 잠시 앉아도 돼. 멈춘다고 끝이 아니야.`,
+`오늘의 느림이 내일의 탄력이다.`,
+`울어도 괜찮아. 눈물은 마음의 샤워니까.`,
+`작은 희망도 밤을 밝힌다.`,
+`당신이 충분히 해냈다는 증거는, 오늘도 여기 있다는 것.`,
+`바람이 센 날, 뿌리는 더 깊어진다.`,
+`“이 또한 지나가리라.”`,
+`비교는 기쁨을 훔친다. 당신은 오직 당신이면 된다.`,
+`무너질 때 배우는 건, 다시 세우는 법.`,
+`가장 어두운 새벽 직전이 가장 춥다—그래도 곧 빛난다.`,
+`당신의 속도는 당신의 이야기다.`,
+`완벽함보다 살아남음이 더 위대하다.`,
+`마음이 말한다: 한 걸음만 더.`,
+`오늘의 당신을 어제의 상처가 부끄러워한다.`,
+`기다림도 용기다.`,
+`충분히 애썼다. 이제 충분히 쉬자.`,
+`“넘어지면 그 자리에서 별을 줍는다.”`,
+`작은 친절이 큰 상처를 덮는다—먼저 나에게.`,
+`포기와 휴식은 다르다.`,
+`당신을 사랑하는 이들은 당신의 실패를 세지 않는다.`,
+`구름 위에도 길은 있다.`,
+`불완전함이 인간을 아름답게 만든다.`,
+`지금 숨 고르는 이 순간이 회복의 시작.`,
+`“천천히 가도 멈추지 않으면 도착한다.”`,
+`어제의 당신이 오늘의 당신을 밀어주고 있다.`,
+`상처는 약해진 곳이 아니라 강해진 자리다.`,
+`삶이 무겁다면 가방에서 타인의 시선을 먼저 꺼내자.`,
+`해답이 없을 땐, 괜찮다는 답이 해답이다.`,
+`당신의 마음은 다시 꽃핀다—계절은 돌아오니까.`,
+`“희망은 깨어 있는 꿈이다.”`,
+`괜찮지 않아도 괜찮다—정직한 고백이 치유의 문.`,
+`오늘의 작은 정리는 내일의 큰 평온.`,
+`불안은 거짓말을 잘한다. 증거를 요구하자.`,
+`당신은 문제보다 크다.`,
+`“한 번의 친절은 두 사람을 따뜻하게 한다.”`,
+`기대를 낮추는 게 아니라 마음을 지키는 거야.`,
+`혼자라고 느껴져도, 하늘은 항상 편이다.`,
+`나에게 부드럽게, 세상엔 단단하게.`,
+`삶이 흔들릴 땐, 루틴을 앵커처럼.`,
+`“용기는 두려움이 없는 게 아니라, 두려움에도 걷는 것.”`,
+`오늘도 해낸 일 하나를 적어보자—증거가 쌓인다.`,
+`실패는 방향을 알려주는 표지판.`,
+`슬픔을 밀어내지 말고 의자를 내어주자—곧 떠난다.`,
+`“작은 걸음이 큰 운명을 바꾼다.”`,
+`당신의 가치엔 조건이 없다.`,
+`감정은 기상, 정체성은 기후—변하는 건 날씨뿐.`,
+`나를 구한 문장은 늘 짧았다: “괜찮아.”`,
+`“돌다리도 두드리면 건널 수 있다.”`,
+`어제의 실수는 오늘의 지혜료.`,
+`당신의 속상함, 유효한 감정이다—인정부터.`,
+`오늘도 해가 떴다. 그게 신호다: 다시 시작.`,
+`오래된 상처도 새 살이 찬다.`,
+`“가장 긴 여행도 한 걸음에서.”`,
+`생각의 소리를 줄이고 숨의 소리를 키우자.`,
+`고맙다는 말은 마음의 연고.`,
+`당신은 이미 누군가의 안전한 곳.`,
+`“행복은 방향이지 목적지가 아니다.”`,
+`어둠을 탓하기보다 작은 불을 켜자.`,
+`도움이 필요하면 손을 들자—약함이 아니라 지혜다.`,
+`오늘의 나에게도 박수 하나.`,
+`“마음먹은 대로 살지 않으면, 사는 대로 마음먹게 된다.”`,
+`불확실성은 모험의 다른 이름.`,
+`결과가 아닌 용기에 점수를 주자.`,
+`“세상은 고통으로 가득하지만, 극복으로도 가득하다.”`,
+`지금의 당신이 과거의 당신을 구했다.`,
+`사라지는 것들이 공간을 만든다—새로운 시작을 위해.`,
+`“비 온 뒤 땅이 굳는다.”`,
+`오늘의 커피처럼, 마음에도 온기를 추가.`,
+`완벽히 괜찮아지지 않아도 충분히 행복할 수 있다.`,
+`“희망을 품는 자에게 길이 열린다.”`,
+`아침은 늘 돌아온다—밤의 길이와 무관하게.`,
+`비교 대신 호기심을 선택하자.`,
+`“나아지는 중”도 훌륭한 상태다.`,
+`상처난 곳으로 빛이 들어온다.`,
+`“자기 자신에게 친절하라—평생 함께할 사람이니까.”`,
+`급할수록 마음을 천천히.`,
+`“작은 승리를 축하하는 습관이 큰 삶을 만든다.”`,
+`끝처럼 느껴져도, 종종 쉼표였다.`,
+`당신의 페이스로, 당신의 레이스를.`,
+`“길을 잃어야 새로운 길을 본다.”`,
+`오늘의 걱정 모두가 현실이 된 적은 거의 없다.`,
+`내일을 바꾸는 힘은 오늘 10분에 있다.`,
+`“넘어지면 하늘을 본다—그것도 괜찮다.”`,
+`사랑받을 자격은 증명하는 게 아니다—선천적이다.`,
+`‘다시’라는 단어만 있으면 충분하다.`,
+`“가벼운 산책도 무거운 마음을 옮긴다.”`,
+`견딘 날들이 당신의 근육이다.`,
+`오늘은 나에게 너그러이, 내일은 세상에 넉넉히.`,
+`“선을 지키는 것이 나를 지키는 것.”`,
+`희망을 잃지 말자—아니, 자주 찾아가자.`,
+`“평온은 훈련이다.”`,
+`누군가의 한마디가 되자: “괜찮아질 거야.”`,
+`마음이 복잡하면, 해야 할 일을 작게.`,
+`“해답이 보이지 않을 땐 방향부터 정하자.”`,
+`당신의 존재는 이미 충분한 선물이다.`,
+`오늘도 해낸 가장 큰 일: 버텼다.`,
+`“선명함은 시간이 만든다.”`,
+`내 편이 되어줄 사람을 먼저 떠올리자—그중에 ‘나’ 포함.`,
+`삶은 완성이 아니라 버전 업.`,
+`오늘의 당신에게 한 줄: 정말 잘하고 있어.`
+    ];
+
+    const quoteEl = document.getElementById('quote-text');
+    if (quoteEl) {
+      const rand = Math.floor(Math.random() * QUOTES.length);
+      quoteEl.textContent = QUOTES[rand];
+    }
+
+    // === 로또 추첨기 iframe(srcdoc) 주입 ===
+    const lottoHTML = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>한국 로또 추첨기</title>
+<style>
+  body { font-family: system-ui, sans-serif; padding: 16px; margin:0; }
+  .btn { padding: 10px 16px; border-radius: 9999px; background: #111; color: #fff; border: none; cursor: pointer; margin-bottom: 12px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .ball { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; box-shadow: 0 4px 12px rgba(0,0,0,0.15); user-select: none; }
+</style>
+</head>
+<body>
+  <button class="btn" onclick="location.reload()">다시</button>
+  <div id="lottoRow" class="row"></div>
+
+<script>
+function bgColor(n) {
+  if (n >= 1 && n <= 10) return { bg: '#FACC15', color: '#000' }; // 노랑
+  if (n >= 11 && n <= 20) return { bg: '#3B82F6', color: '#fff' }; // 파랑
+  if (n >= 21 && n <= 30) return { bg: '#EF4444', color: '#fff' }; // 빨강
+  if (n >= 31 && n <= 40) return { bg: '#000000', color: '#fff' }; // 까망
+  return { bg: '#22C55E', color: '#fff' }; // 초록
+}
+
+function drawSix() {
+  const set = new Set();
+  while (set.size < 6) set.add(Math.floor(Math.random() * 45) + 1);
+  return Array.from(set).sort((a,b) => a - b);
+}
+
+function drawLotto() {
+  const nums = drawSix();
+  const row = document.getElementById('lottoRow');
+  row.innerHTML = '';
+  nums.forEach(n => {
+    const { bg, color } = bgColor(n);
+    const div = document.createElement('div');
+    div.className = 'ball';
+    div.style.backgroundColor = bg;
+    div.style.color = color;
+    div.textContent = n;
+    row.appendChild(div);
+  });
+}
+
+drawLotto(); // 초기 실행
+<\/script>
+</body>
+</html>`;
+
+    const iframe = document.getElementById('fortune-iframe');
+    if (iframe) {
+      iframe.srcdoc = lottoHTML; // 별도 파일 없이 즉시 삽입
+    }
   </script>
 
-<footer id="site-footer" class="text-center text-sm text-gray-700 py-6">당신의 상담친구 혜숙이</footer>
-
+  <footer id="site-footer" class="text-center text-sm text-gray-700 py-6">당신의 상담친구 혜숙이</footer>
 </body>
 </html>
