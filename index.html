@@ -22,29 +22,21 @@
         }
     </style>
 </head>
-<body class="bg-[#9bbbd4] font-sans">
-
-    <div id="app" class="flex flex-col h-screen max-w-3xl mx-auto">
-        <!-- 헤더 -->
-        <header class="bg-white/30 backdrop-blur-sm text-center py-4 shadow-md">
+<body class="bg-white font-sans"> <div id="app" class="flex flex-col h-screen max-w-3xl mx-auto bg-[#9bbbd4]"> <header class="bg-white/30 backdrop-blur-sm text-center py-4 shadow-md">
             <h1 class="text-xl font-bold text-gray-800">당신의 상담친구 혜숙이</h1>
             <p class="text-sm text-gray-600">당신의 이야기를 들어줄게요<br>가정/학업/이성/금전/마음상태 뭐든지 편하게 말씀해주세요</p>
         </header>
 
-        <!-- 채팅 메시지 컨테이너 -->
         <div id="chat-container" class="flex-1 p-4 overflow-y-auto space-y-4">
-            <!-- 초기 메시지 -->
             <div class="flex justify-start">
                 <div class="bg-white rounded-lg p-3 max-w-xs md:max-w-md shadow">
                     <p class="text-gray-800">안녕하세요, 혜숙이에요. 어떤 고민이 있으신가요? 편하게 이야기해주세요.</p>
                 </div>
             </div>
-            <!-- 동적 메시지가 여기에 추가됩니다 -->
-        </div>
+            </div>
 
-        <!-- 로딩 인디케이터 -->
         <div id="loading" class="hidden flex items-center justify-start p-4">
-             <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2">
                 <div class="bg-white rounded-lg p-3 shadow flex items-center space-x-2">
                     <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: -0.3s;"></div>
                     <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: -0.15s;"></div>
@@ -54,7 +46,6 @@
         </div>
 
 
-        <!-- 입력창 -->
         <footer class="p-4 bg-white/30 backdrop-blur-sm">
             <div class="relative flex items-center">
                 <input type="text" id="user-input" class="w-full bg-white rounded-full py-3 pl-5 pr-14 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner" placeholder="메시지를 입력하세요...">
