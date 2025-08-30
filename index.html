@@ -48,18 +48,20 @@
 
 <!-- Header + 햄버거 메뉴 버튼 -->
 <header class="bg-white/30 backdrop-blur-sm text-center py-4 shadow-md relative">
-    <h1 class="text-xl font-bold text-gray-800 flex items-center justify-center gap-2">
-        <img src="https://hyesugi.com/hyesugi.jpg" alt="혜숙이" class="w-14 h-14 rounded-full object-cover">
-        당신의 상담친구 혜숙이
-    </h1>
-    <p class="text-sm text-gray-600">우측 메뉴를 눌러보세요</p>
+  <h1 class="text-xl font-bold text-gray-800 flex items-center justify-center gap-2">
+    <a href="https://hyesugi.com" class="flex items-center justify-center gap-2" aria-label="hyesugi.com으로 이동">
+      <img src="https://hyesugi.com/hyesugi.jpg" alt="혜숙이" class="w-14 h-14 rounded-full object-cover">
+      당신의 상담친구 혜숙이
+    </a>
+  </h1>
+  <p class="text-sm text-gray-600">우측 메뉴를 눌러보세요</p>
 
-    <!-- 햄버거 버튼 -->
-    <button id="menu-btn" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-white/60 focus:outline-none focus:ring-2 focus:ring-black/40" aria-label="메뉴 열기">
-      <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
-      </svg>
-    </button>
+  <!-- 햄버거 버튼 -->
+  <button id="menu-btn" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-white/60 focus:outline-none focus:ring-2 focus:ring-black/40" aria-label="메뉴 열기">
+    <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
+    </svg>
+  </button>
 </header>
 
 <!-- Chat Container -->
@@ -104,9 +106,16 @@
     </button>
   </div>
   <nav class="p-4 space-y-2">
-    <a href="#" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">menu1</a>
-    <a href="#" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">menu2</a>
-    <a href="#" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">menu3</a>
+    <a href="luck" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">위로와 행운</a>
+    <a href="fate" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">나의 사주는</a>
+    <a href="board" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">익명 게시판</a>
+<a href="expert" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">전문가 상담</a>
+<a href="solo" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">솔로는 여기</a>
+<a href="money" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">돈되는 정보</a>
+<a href="game" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">신나는 게임</a>
+<a href="info" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">이용 안내</a>
+<a href="#" id="share-btn" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">공유하기</a>
+
   </nav>
 </aside>
 
@@ -206,6 +215,34 @@ menuBtn.addEventListener('click', openDrawer);
 drawerOverlay.addEventListener('click', closeDrawer);
 drawerClose.addEventListener('click', closeDrawer);
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
+
+// === Share Button ===
+const shareBtn = document.getElementById('share-btn');
+if (shareBtn) {
+  shareBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const shareData = {
+      title: '혜숙이의 상담소',
+      text: '다정한 AI 상담가 혜숙이와 대화해 보세요.',
+      url: 'https://hyesugi.com'
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        alert('링크가 클립보드에 복사되었습니다: ' + shareData.url);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('공유에 실패했어요. 잠시 후 다시 시도해 주세요.');
+    }
+  });
+}
+
 </script>
+
+<footer id="site-footer" class="text-center text-sm text-gray-700 py-6">당신의 상담친구 혜숙이</footer>
+
 </body>
 </html>
