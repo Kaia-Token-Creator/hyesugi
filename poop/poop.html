@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>똥피하기 — 땅 버전(개선)</title>
+  <style>
+    html,body{margin:0;height:100%;background:#fff;overflow:hidden}
+    body{display:flex;justify-content:center;align-items:stretch}
+    .game-wrap{
+      position:relative;width:90vw;max-width:960px;min-width:360px;height:100svh;
+      background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.06)
+    }
+    canvas{display:block;width:100%;height:100%;touch-action:none;background:#fff}
+    .hud{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:center;gap:100px}
+    .chip{background:rgba(0,0,0,.05);padding:6px 10px;border-radius:12px;font-weight:700}
+    .startbtn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+      padding:12px 16px;border:1px solid #ddd;background:#fff;border-radius:12px;font-weight:700}
+    .pads{position:absolute;inset:auto 0 0 0;display:flex;height:28vh;opacity:.08}
+    .pad{flex:1;touch-action:manipulation}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <div class="game-wrap">
+    <canvas id="game"></canvas>
+    <div class="hud">
+      <div class="chip">점수: <span id="sc">0</span></div>
+      <div class="chip">최고: <span id="best">0</span></div>
+    </div>
+    <button id="start" class="startbtn">게임 시작 ▶</button>
+    <div class="pads">
+      <div id="left" class="pad" aria-label="왼쪽"></div>
+      <div id="right" class="pad" aria-label="오른쪽"></div>
+    </div>
+  </div>
+
+<script>
+(()=>{
+  const wrap=document.querySelector('.game-wrap');
+  const cvs=document.getElementById('game'),ctx=cvs.getContext('2d');
+  const scEl=document.getElementById('sc'),bestEl=document.getElementById('best');
+  const startBtn=document.getElementById('start'),Lpad=document.getElementById('left'),Rpad=document.getElementById('right');
+
+  let DPR=Math.max(1,Math.min(2,window.devicePixelRatio||1));
+  function fit(){
+    DPR=Math.max(1,Math.min(2,window.devicePixelRatio||1));
+    const r=wrap.getBoundingClientRect();
+    cvs.width=Math.floor(r.width*DPR);cvs.height=Math.floor(r.height*DPR);
+    ctx.setTransform(1,0,0,1,0,0);ctx.scale(DPR,DPR);
+  }fit();addEventListener('resize',fit);
+
+  // 상태
+  let playing=false,over=false,last=0,acc=0,score=0,best=Number(localStorage.getItem('bestGround2')||0);
+  bestEl.textContent=best;
+
+  // 월드: 가동범위 = 화면 폭 (playFactor=1)
+  const world={ playFactor:1, groundH:0.14 };
+  let groundY=0;
+
+  // 입력 & 가속(꾹 누르면 boost)
+  let L=false,R=false, boost=false, boostTimer=null;
+  const BOOST_MULT=1.28;  // 가속 배수
+  const BOOST_DELAY=200;  // 꾹 누른 판정(ms)
+
+  function setHold(flag){
+    if(flag){
+      clearTimeout(boostTimer);
+      boostTimer=setTimeout(()=>{ boost=true; }, BOOST_DELAY);
+    }else{
+      clearTimeout(boostTimer);
+      boost=false;
+    }
+  }
+
+  // 마우스 꾹 눌러도 가속
+  cvs.addEventListener('pointerdown',()=>setHold(true));
+  cvs.addEventListener('pointerup',()=>setHold(false));
+  cvs.addEventListener('pointercancel',()=>setHold(false));
+  cvs.addEventListener('pointerout',()=>setHold(false));
+
+  const player={
+    w:40,h:16,x:0,y:0,spdBase:320,
+    reset(){
+      const W=cvs.width/DPR,H=cvs.height/DPR;
+      groundY=Math.floor(H*(1-world.groundH));
+      const playW=W*world.playFactor,playX=(W-playW)/2; // playX=0, playW=W 와 동일
+      this.w=Math.max(28,W*0.06);
+      this.h=this.w*0.4;
+      this.x=playX+playW/2-this.w/2;
+      this.y=groundY-this.h;
+    },
+    draw(t){
+      // 검정색 사람 + 팔 빠른 흔들기
+      const cx=this.x+this.w/2,cy=this.y+this.h;
+      const scale=Math.max(0.9,Math.min(1.4,this.w/60));
+      // 팔 흔들 주기(빠르게)
+      const A=8*scale;                // 진폭
+      const w=18;                     // 각주파수(빠르게)
+      const sway=Math.sin(t*w)*A;
+
+      ctx.save();
+      ctx.translate(cx,cy);
+      ctx.strokeStyle="#000"; ctx.fillStyle="#000";
+      ctx.lineWidth=3.2; ctx.lineCap="round"; ctx.lineJoin="round";
+      // 다리
+      line(-6*scale,0,-2*scale,-12*scale);
+      line( 6*scale,0, 2*scale,-12*scale);
+      // 몸통
+      line(0,-12*scale,0,-28*scale);
+      // 팔(좌/우 반대 위상 느낌)
+      line(0,-22*scale, -10*scale, (-16*scale) + sway );
+      line(0,-22*scale,  10*scale, (-16*scale) - sway );
+      // 머리
+      ctx.beginPath(); ctx.arc(0,-34*scale,6*scale,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+  };
+  function line(x1,y1,x2,y2){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
+
+  // 얼룩
+  const stains=[];
+  function addStain(x,y){
+    stains.push({x,y,r:10+Math.random()*14,alpha:0.9});
+    if(stains.length>80) stains.shift();
+  }
+
+  // 똥
+  const poops=[];
+  function spawn(level){
+    const W=cvs.width/DPR;
+    const playW=W*world.playFactor,playX=(W-playW)/2; // 0
+    const size=18+Math.random()*20;
+    const vy=220+level*60+Math.random()*70;
+    poops.push({
+      x:playX+size+Math.random()*(playW-2*size),
+      y:-size,
+      r:size*0.45,
+      vy, rot:0, vr:(Math.random()-.5)*2
+    });
+  }
+
+  function reset(){
+    playing=true;over=false;score=0;acc=0;last=0;poops.length=0;stains.length=0;
+    player.reset();for(let i=0;i<4;i++)spawn(1);
+    startBtn.classList.add('hidden');
+    requestAnimationFrame(loop);
+  }
+
+  function gameOver(){
+    if(over) return;
+    over=true;playing=false;best=Math.max(best,Math.floor(score));
+    localStorage.setItem('bestGround2',best);bestEl.textContent=best;
+    startBtn.textContent=`다시 ▶ (점수 ${Math.floor(score)})`;startBtn.classList.remove('hidden');
+    setHold(false);
+  }
+
+  // 키 입력(일시정지 제거)
+  addEventListener('keydown',e=>{
+    const k=e.key.toLowerCase();
+    if(k==="arrowleft"||k==="a") L=true;
+    if(k==="arrowright"||k==="d") R=true;
+    if(!playing&&(k===" "||k==="enter")) reset();
+  });
+  addEventListener('keyup',e=>{
+    const k=e.key.toLowerCase();
+    if(k==="arrowleft"||k==="a") L=false;
+    if(k==="arrowright"||k==="d") R=false;
+  });
+  startBtn.onclick=reset;
+
+  // 터치(좌/우 + 꾹 누르면 가속)
+  function bind(el,set){
+    el.addEventListener('touchstart',e=>{ set(true); setHold(true); e.preventDefault(); }, {passive:false});
+    el.addEventListener('touchend',e=>{ set(false); setHold(false); e.preventDefault(); }, {passive:false});
+    el.addEventListener('touchcancel',e=>{ set(false); setHold(false); e.preventDefault(); }, {passive:false});
+  }
+  bind(Lpad,v=>L=v); bind(Rpad,v=>R=v);
+
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+  function drawBackground(ts){
+    const W=cvs.width/DPR,H=cvs.height/DPR;
+    ctx.clearRect(0,0,W,H);
+    // 하늘
+    ctx.fillStyle="#ffffff";ctx.fillRect(0,0,W,groundY);
+    ctx.fillStyle="#f7f7fb";ctx.fillRect(0,groundY-6,W,6);
+    // 땅
+    ctx.fillStyle="#e9dfcc";ctx.fillRect(0,groundY,W,H-groundY);
+    // 땅 스트라이프
+    ctx.strokeStyle="#d9cdb7";ctx.lineWidth=2;
+    const step=24; ctx.beginPath();
+    for(let x=0;x<W;x+=step){ ctx.moveTo(x,groundY+2); ctx.lineTo(x+step*0.5,groundY+10); }
+    ctx.stroke();
+    // 얼룩
+    for(const s of stains){
+      ctx.globalAlpha=s.alpha;
+      ctx.fillStyle="#b07d45";
+      ctx.beginPath();ctx.ellipse(s.x,s.y,s.r*1.2,s.r*0.8,0,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=1; s.alpha*=0.996;
+    }
+    // 테두리(게임 영역)
+    ctx.strokeStyle="#222"; ctx.lineWidth=2;
+    ctx.strokeRect(1,1,W-2,H-2);
+  }
+
+  function drawPoop(p){
+    ctx.save();
+    ctx.translate(p.x,p.y);
+    ctx.rotate(p.rot);
+    ctx.font=`${p.r*2}px serif`;
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText("💩",0,0);
+    ctx.restore();
+  }
+
+  function loop(ts){
+    if(!playing||over) return;
+    const t=ts/1000, dt=last?(Math.min(0.034,t-last)):0.016; last=t;
+
+    const W=cvs.width/DPR,H=cvs.height/DPR;
+    drawBackground(ts);
+
+    // 난이도 & 스폰
+    score += dt*12;
+    scEl.textContent = Math.floor(score);
+    const level = 1 + Math.min(5, score/70);
+    acc += dt;
+    const interval = clamp(0.85 - level*0.12, 0.14, 0.85);
+    while (acc > interval){ spawn(level); acc -= interval; }
+
+    // 이동 (가동범위 = 전체 폭)
+    const speed = player.spdBase * (boost ? BOOST_MULT : 1);
+    player.x += ((R?1:0) - (L?1:0)) * speed * dt;
+    player.x = clamp(player.x, 0, W - player.w);
+
+    // 똥
+    for(let i=poops.length-1;i>=0;i--){
+      const p=poops[i];
+      p.y+=p.vy*dt; p.rot+=(Math.PI/180)*p.vr;
+      drawPoop(p);
+
+      // 충돌(사각형 근사)
+      const rx=player.x, ry=player.y, rw=player.w, rh=player.h;
+      const insideX = p.x > rx-6 && p.x < rx+rw+6;
+      const insideY = p.y > ry-6 && p.y < ry+rh+6;
+      if(insideX && insideY){ gameOver(); break; }
+
+      // 땅 충돌 -> 얼룩
+      if(p.y + p.r > groundY){
+        addStain(p.x, groundY + 8);
+        poops.splice(i,1);
+      }else if(p.y - p.r > H + 60){ poops.splice(i,1); }
+    }
+
+    // 사람(시간 전달해 팔 흔들기)
+    player.draw(t);
+
+    requestAnimationFrame(loop);
+  }
+
+  // 초기
+  player.reset();
+})();
+</script>
+</body>
+</html>

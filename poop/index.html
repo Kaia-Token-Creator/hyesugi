@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QR5TWB3RYJ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QR5TWB3RYJ');
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9891583086388017" crossorigin="anonymous"></script>
+
+  <!-- 기본 설정 -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>혜숙이, 마음의 쉼터</title>
+  <meta name="description" content="상담가이자 다정한 친구, ‘혜숙이’가 당신의 고민을 들어드립니다." />
+  <link rel="canonical" href="https://hyesugi.com/" />
+  <meta name="robots" content="index,follow" />
+  <meta name="theme-color" content="#9bbbd4" />
+
+  <!-- Favicon & App Icons -->
+  <link rel="icon" href="https://hyesugi.com/favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="https://hyesugi.com/apple-touch-icon.png" sizes="180x180" />
+  <link rel="manifest" href="https://hyesugi.com/site.webmanifest" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="hyesugi.com" />
+  <meta property="og:url" content="https://hyesugi.com/" />
+  <meta property="og:title" content="혜숙이의 상담소" />
+  <meta property="og:description" content="‘혜숙이’가 다정하게 고민을 들어드립니다" />
+  <meta property="og:image" content="https://hyesugi.com/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="혜숙이 상담 화면 미리보기" />
+
+  <!-- Twitter (X) Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="혜숙이의 상담소" />
+  <meta name="twitter:description" content="다정한 AI 상담가 ‘혜숙이’와 대화해 보세요." />
+  <meta name="twitter:image" content="https://hyesugi.com/og-image.jpg" />
+
+  <link rel="preload" as="image" href="https://hyesugi.com/preview.jpg" imagesrcset="https://hyesugi.com/preview.jpg" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white font-sans">
+  <!-- ⛳ 파란 배경 제거: bg-[#9bbbd4] 클래스 삭제 -->
+  <div id="app" class="flex flex-col min-h-screen max-w-3xl mx-auto">
+
+    <!-- Header + 햄버거 메뉴 버튼 (그대로) -->
+    <header class="bg-white/30 backdrop-blur-sm text-center py-4 shadow-md relative">
+      <h1 class="text-xl font-bold text-gray-800 flex items-center justify-center gap-2">
+        <a href="https://hyesugi.com" class="flex items-center justify-center gap-2" aria-label="hyesugi.com으로 이동">
+          <img src="https://hyesugi.com/hyesugi.jpg" alt="혜숙이" class="w-14 h-14 rounded-full object-cover">
+          당신의 상담친구 혜숙이
+        </a>
+      </h1>
+      <p class="text-sm text-gray-600"><b>똥피하기</p>
+
+      <!-- 햄버거 버튼 -->
+      <button id="menu-btn" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-white/60 focus:outline-none focus:ring-2 focus:ring-black/40" aria-label="메뉴 열기">
+        <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- 본문: poop iframe만 삽입 -->
+    <main id="content" class="flex-1 p-4">
+      <section class="py-2">
+        <iframe
+          src="https://hyesugi.com/poop/poop.html"
+          title="똥피하기"
+          loading="eager"
+          class="w-full max-w-3xl mx-auto rounded-2xl border border-gray-200 shadow"
+          style="height: 980px; background:#fafafa;"
+        ></iframe>
+      </section>
+    </main>
+  </div>
+
+  <!-- Overlay & Drawer (그대로) -->
+  <div id="drawer-overlay" class="fixed inset-0 bg-black/30 hidden z-40"></div>
+  <aside id="drawer" class="fixed right-0 top-0 h-full w-1/2 max-w-md bg-white shadow-xl translate-x-full transition-transform duration-300 z-50">
+    <div class="flex items-center justify-between p-4 border-b">
+      <h2 class="font-bold text-gray-800">메뉴</h2>
+      <button id="drawer-close" class="p-2 rounded-md hover:bg-gray-100" aria-label="메뉴 닫기">
+        <svg class="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <nav class="p-4 space-y-2">
+      <a href="luck" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">위로와 행운</a>
+      <a href="fate" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">나의 사주는</a>
+      <a href="board" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">익명 게시판</a>
+      <a href="expert" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">전문가 상담</a>
+      <a href="solo" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">솔로는 여기</a>
+      <a href="money" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">돈되는 정보</a>
+      <a href="game" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">신나는 게임</a>
+      <a href="info" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">이용 안내</a>
+      <a href="#" id="share-btn" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">공유하기</a>
+    </nav>
+  </aside>
+
+  <!-- 공통 스크립트 (그대로) -->
+  <script>
+    // === Drawer Toggle ===
+    const menuBtn = document.getElementById('menu-btn');
+    const drawer = document.getElementById('drawer');
+    const drawerOverlay = document.getElementById('drawer-overlay');
+    const drawerClose = document.getElementById('drawer-close');
+
+    function openDrawer() {
+      drawer.classList.remove('translate-x-full');
+      drawerOverlay.classList.remove('hidden');
+    }
+    function closeDrawer() {
+      drawer.classList.add('translate-x-full');
+      drawerOverlay.classList.add('hidden');
+    }
+
+    menuBtn.addEventListener('click', openDrawer);
+    drawerOverlay.addEventListener('click', closeDrawer);
+    drawerClose.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
+
+    // === Share Button ===
+    const shareBtn = document.getElementById('share-btn');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const shareData = {
+          title: '혜숙이의 상담소',
+          text: '다정한 AI 상담가 혜숙이와 대화해 보세요.',
+          url: 'https://hyesugi.com'
+        };
+        try {
+          if (navigator.share) {
+            await navigator.share(shareData);
+          } else {
+            await navigator.clipboard.writeText(shareData.url);
+            alert('링크가 클립보드에 복사되었습니다: ' + shareData.url);
+          }
+        } catch (err) {
+          console.error(err);
+          alert('공유에 실패했어요. 잠시 후 다시 시도해 주세요.');
+        }
+      });
+    }
+  </script>
+
+  <footer id="site-footer" class="text-center text-sm text-gray-700 py-6">당신의 상담친구 혜숙이</footer>
+</body>
+</html>
