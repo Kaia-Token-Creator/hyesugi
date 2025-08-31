@@ -48,7 +48,7 @@
           당신의 상담친구 혜숙이
         </a>
       </h1>
-      <p class="text-sm text-gray-600">솔로는 여기</p>
+      <p class="text-sm text-gray-600"><b>솔로는 여기</p>
 
       <!-- 햄버거 버튼 -->
       <button id="menu-btn" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-white/60 focus:outline-none focus:ring-2 focus:ring-black/40" aria-label="메뉴 열기">
@@ -60,55 +60,48 @@
 
     <!-- 공통 본문 컨테이너: 각 페이지는 여기만 수정 -->
     <main id="content" class="flex-1 p-4">
-      <!-- ✅ 솔로 서비스 리스트 말풍선 -->
-      <section class="py-4">
-        <div class="relative mx-auto max-w-3xl bg-[#F7E600] text-gray-900 rounded-2xl p-5 shadow">
-          <h2 class="text-base font-bold mb-2">솔로는 여기 💛</h2>
-          <p class="text-sm mb-3">해당 페이지에는 광고가 포함되어 있습니다</p>
+  <!-- ✅ 솔로 서비스: 말풍선 4개로 분리 -->
+  <section class="py-4 space-y-4 max-w-3xl mx-auto">
+    <p class="text-sm text-gray-800 mb-2">해당 페이지에는 광고가 포함되어 있습니다</p>
 
-          <ul class="space-y-2">
-            <!-- 데이톡 -->
-            <li>
-              <a href="https://iryan.kr/t7372qwd34" target="_blank" rel="noopener noreferrer"
-                 class="block rounded-lg px-3 py-2 hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-black/30 text-gray-900 visited:text-gray-900">
-                <div class="font-semibold">데이톡</div>
-                <div class="text-sm">100만 회원과 매일매일 새로운 이성이 선톡, 혹시 내 인연이 여기에?</div>
-              </a>
-            </li>
+    <!-- 1) 데이톡 -->
+    <a href="https://iryan.kr/t7372qwd34" target="_blank" rel="noopener noreferrer" class="group block">
+      <div class="relative bg-[#F7E600] text-gray-900 rounded-2xl p-5 shadow hover:shadow-lg transition-shadow">
+        <div class="font-semibold">데이톡</div>
+        <p class="text-sm mt-1">100만 회원과 매일매일 새로운 이성이 선톡, 혹시 내 인연이 여기에?</p>
+        <span class="absolute -bottom-2 left-8 block w-4 h-4 bg-[#F7E600] rotate-45"></span>
+      </div>
+    </a>
 
-            <!-- 케이메이트 -->
-            <li>
-              <a href="https://iryan.kr/t7372qw09f" target="_blank" rel="noopener noreferrer"
-                 class="block rounded-lg px-3 py-2 hover:bg黑/5 focus:outline-none focus:ring-2 focus:ring-black/30 text-gray-900 visited:text-gray-900">
-                <div class="font-semibold">케이메이트</div>
-                <div class="text-sm">한국은 너무 좁다구!  한국을 좋아하는 외국인 이성친구 만들기?</div>
-              </a>
-            </li>
+    <!-- 2) 케이메이트 -->
+    <a href="https://iryan.kr/t7372qw09f" target="_blank" rel="noopener noreferrer" class="group block">
+      <div class="relative bg-[#F7E600] text-gray-900 rounded-2xl p-5 shadow hover:shadow-lg transition-shadow">
+        <div class="font-semibold">케이메이트</div>
+        <p class="text-sm mt-1">한국은 너무 좁다구! 한국을 좋아하는 외국인 이성친구 만들기?</p>
+        <span class="absolute -bottom-2 left-8 block w-4 h-4 bg-[#F7E600] rotate-45"></span>
+      </div>
+    </a>
 
-            <!-- 미리 -->
-            <li>
-              <a href="https://iryan.kr/t7379dohzt" target="_blank" rel="noopener noreferrer"
-                 class="block rounded-lg px-3 py-2 hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-black/30 text-gray-900 visited:text-gray-900">
-                <div class="font-semibold">미리</div>
-                <div class="text-sm">운명을 믿어? 여성회원들 선호도 1순위! 궁합 먼저 보고 고르기!</div>
-              </a>
-            </li>
+    <!-- 3) 미리 -->
+    <a href="https://iryan.kr/t7379dohzt" target="_blank" rel="noopener noreferrer" class="group block">
+      <div class="relative bg-[#F7E600] text-gray-900 rounded-2xl p-5 shadow hover:shadow-lg transition-shadow">
+        <div class="font-semibold">미리</div>
+        <p class="text-sm mt-1">운명을 믿어? 여성회원들 선호도 1순위! 궁합 먼저 보고 고르기!</p>
+        <span class="absolute -bottom-2 left-8 block w-4 h-4 bg-[#F7E600] rotate-45"></span>
+      </div>
+    </a>
 
-            <!-- 엔노블(결혼) -->
-            <li>
-              <a href="https://iryan.kr/t7372st9jn" target="_blank" rel="noopener noreferrer"
-                 class="block rounded-lg px-3 py-2 hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-black/30 text-gray-900 visited:text-gray-900">
-                <div class="font-semibold">엔노블(결혼)</div>
-                <div class="text-sm">나는 연애보다는 결혼! 진짜 제대로된 결혼 상대를 찾는다면</div>
-              </a>
-            </li>
-          </ul>
+    <!-- 4) 엔노블(결혼) -->
+    <a href="https://iryan.kr/t7372st9jn" target="_blank" rel="noopener noreferrer" class="group block">
+      <div class="relative bg-[#F7E600] text-gray-900 rounded-2xl p-5 shadow hover:shadow-lg transition-shadow">
+        <div class="font-semibold">엔노블(결혼)</div>
+        <p class="text-sm mt-1">나는 연애보다는 결혼! 진짜 제대로된 결혼 상대를 찾는다면</p>
+        <span class="absolute -bottom-2 left-8 block w-4 h-4 bg-[#F7E600] rotate-45"></span>
+      </div>
+    </a>
+  </section>
+</main>
 
-          <!-- 말풍선 꼬리 -->
-          <span class="absolute -bottom-2 left-8 block w-4 h-4 bg-[#F7E600] rotate-45"></span>
-        </div>
-      </section>
-    </main>
   </div>
 
   <!-- Overlay & Drawer -->
