@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QR5TWB3RYJ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-QR5TWB3RYJ');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9891583086388017"
+       crossorigin="anonymous"></script>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>혜숙이, 마음의 쉼터</title>
+  <meta name="description" content="상담가이자 다정한 친구, ‘혜숙이’가 당신의 고민을 들어드립니다." />
+  <link rel="canonical" href="https://hyesugi.com/" />
+  <meta name="robots" content="index,follow" />
+  <meta name="theme-color" content="#9bbbd4" />
+  <link rel="icon" href="https://hyesugi.com/favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="https://hyesugi.com/apple-touch-icon.png" sizes="180x180" />
+  <link rel="manifest" href="https://hyesugi.com/site.webmanifest" />
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="hyesugi.com" />
+  <meta property="og:url" content="https://hyesugi.com/" />
+  <meta property="og:title" content="혜숙이의 상담소" />
+  <meta property="og:description" content="‘혜숙이’가 다정하게 고민을 들어드립니다" />
+  <meta property="og:image" content="https://hyesugi.com/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="혜숙이 상담 화면 미리보기" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="혜숙이의 상담소" />
+  <meta name="twitter:description" content="다정한 AI 상담가 ‘혜숙이’와 대화해 보세요." />
+  <meta name="twitter:image" content="https://hyesugi.com/og-image.jpg" />
+  <link rel="preload" as="image" href="https://hyesugi.com/preview.jpg" imagesrcset="https://hyesugi.com/preview.jpg" />
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- ▼ 이 페이지 전용: 파란판 없애고 게임 배경색 사용 -->
+  <style>
+    body { background:#faf8ef; }
+    #app { background: transparent !important; }
+  </style>
+
+  <!-- ▼ 2048 게임 스타일(스코프: #g2048 내부에만 적용) -->
+  <style>
+    #g2048 {
+      --bg: #faf8ef;
+      --board: #bbada0;
+      --tile-empty: #cdc1b4;
+      --text: #776e65;
+      --tile-2: #eee4da; --tile-4: #ede0c8; --tile-8: #f2b179; --tile-16: #f59563; --tile-32: #f67c5f; --tile-64: #f65e3b;
+      --tile-128: #edcf72; --tile-256: #edcc61; --tile-512: #edc850; --tile-1024: #edc53f; --tile-2048: #edc22e;
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", AppleSDGothicNeo, Helvetica, Arial, sans-serif;
+      max-width: 520px; margin: 0 auto; padding: 16px;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      touch-action: none; /* 게임 중 제스처로 페이지 스크롤 방지 */
+    }
+    #g2048 header { display:flex; justify-content: space-between; align-items:center; gap:12px; }
+    #g2048 h1 { font-size: clamp(20px, 6vw, 36px); margin: 0; letter-spacing: 0.5px; }
+    #g2048 .badges { display:flex; gap:8px; }
+    #g2048 .badge { background:#bbada0; color:#fff; padding:8px 12px; border-radius:10px; text-align:center; min-width:84px; }
+    #g2048 .badge .label { font-size:12px; opacity:.9; }
+    #g2048 .badge .val { font-size:18px; font-weight:700; }
+    #g2048 .btns { display:flex; gap:8px; margin-top:8px; }
+    #g2048 button { appearance:none; border:none; border-radius:10px; padding:10px 12px; background:#8f7a66; color:#fff; font-weight:700; cursor:pointer; }
+    #g2048 button:active { transform: translateY(1px); }
+    #g2048 .game-wrap { margin-top:14px; }
+    #g2048 .board {
+      background: var(--board);
+      border-radius: 14px;
+      position: relative;
+      aspect-ratio: 1 / 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: clamp(6px, 1.4vw, 12px);
+      padding: clamp(6px, 1.4vw, 12px);
+      user-select: none; -webkit-user-select: none; overflow: hidden;
+    }
+    #g2048 .cell { background: var(--tile-empty); border-radius:10px; width:100%; height:100%; }
+    #g2048 .tile { position:absolute; inset:0; margin:0; }
+    #g2048 .tile > div {
+      position:absolute; border-radius:10px; display:flex; align-items:center; justify-content:center;
+      font-weight:800; font-size: clamp(18px, 5.2vw, 34px); color:#776e65;
+      transition: transform 80ms ease-in, background-color 80ms linear, color 80ms linear;
+    }
+    #g2048 .n-2, #g2048 .n-4 { color:#776e65; }
+    #g2048 .n-8, #g2048 .n-16, #g2048 .n-32, #g2048 .n-64, #g2048 .n-128, #g2048 .n-256, #g2048 .n-512, #g2048 .n-1024, #g2048 .n-2048 { color:#f9f6f2; }
+    #g2048 .n-2 { background: var(--tile-2); }
+    #g2048 .n-4 { background: var(--tile-4); }
+    #g2048 .n-8 { background: var(--tile-8); }
+    #g2048 .n-16 { background: var(--tile-16); }
+    #g2048 .n-32 { background: var(--tile-32); }
+    #g2048 .n-64 { background: var(--tile-64); }
+    #g2048 .n-128 { background: var(--tile-128); }
+    #g2048 .n-256 { background: var(--tile-256); }
+    #g2048 .n-512 { background: var(--tile-512); }
+    #g2048 .n-1024 { background: var(--tile-1024); font-size: clamp(16px, 4.6vw, 30px); }
+    #g2048 .n-2048 { background: var(--tile-2048); font-size: clamp(14px, 4.2vw, 26px); }
+    #g2048 .overlay { position:absolute; inset:0; display:none; align-items:center; justify-content:center; background:rgba(238,228,218,.73); border-radius:14px; text-align:center; padding:24px; }
+    #g2048 .overlay.show { display:flex; }
+    #g2048 .overlay h2 { margin:0 0 8px; font-size: clamp(18px, 5.4vw, 28px); }
+    #g2048 .overlay p { margin:0 0 14px; }
+    #g2048 .sr-only { position:absolute; left:-9999px; }
+  </style>
+</head>
+<body class="bg-white font-sans">
+  <div id="app" class="flex flex-col min-h-screen max-w-3xl mx-auto">
+
+    <!-- Header + 햄버거 메뉴 버튼 (유지) -->
+    <header class="bg-white/30 backdrop-blur-sm text-center py-4 shadow-md relative">
+      <h1 class="text-xl font-bold text-gray-800 flex items-center justify-center gap-2">
+        <a href="https://hyesugi.com" class="flex items-center justify-center gap-2" aria-label="hyesugi.com으로 이동">
+          <img src="https://hyesugi.com/hyesugi.jpg" alt="혜숙이" class="w-14 h-14 rounded-full object-cover">
+          당신의 상담친구 혜숙이
+        </a>
+      </h1>
+      <p class="text-sm text-gray-600">우측 메뉴를 눌러보세요</p>
+
+      <button id="menu-btn" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-white/60 focus:outline-none focus:ring-2 focus:ring-black/40" aria-label="메뉴 열기">
+        <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- 본문: 2048 게임 직삽입 -->
+    <main id="content" class="flex-1 p-4">
+      <section id="g2048" role="application" aria-label="2048 Game">
+        <header>
+          <h1>2048</h1>
+          <div class="badges" aria-hidden="true">
+            <div class="badge" id="scoreBox"><div class="label">SCORE</div><div class="val" id="score">0</div></div>
+            <div class="badge" id="bestBox"><div class="label">BEST</div><div class="val" id="best">0</div></div>
+          </div>
+        </header>
+        <div class="btns">
+          <button id="newGame" aria-label="새 게임">새 게임</button>
+          <button id="undoBtn" aria-label="되돌리기">되돌리기</button>
+        </div>
+        <div class="game-wrap">
+          <div class="board" id="board" tabindex="0" aria-label="게임 보드 4x4" aria-live="polite"></div>
+          <div class="overlay" id="overlay" role="dialog" aria-modal="true">
+            <div>
+              <h2 id="ovTitle">게임 종료</h2>
+              <p id="ovMsg">다시 도전해볼까요?</p>
+              <button id="retry">다시 시작</button>
+            </div>
+          </div>
+        </div>
+        <p class="sr-only" id="status" aria-live="assertive"></p>
+      </section>
+    </main>
+  </div>
+
+  <!-- Overlay & Drawer (유지) -->
+  <div id="drawer-overlay" class="fixed inset-0 bg-black/30 hidden z-40"></div>
+  <aside id="drawer" class="fixed right-0 top-0 h-full w-1/2 max-w-md bg-white shadow-xl translate-x-full transition-transform duration-300 z-50">
+    <div class="flex items-center justify-between p-4 border-b">
+      <h2 class="font-bold text-gray-800">메뉴</h2>
+      <button id="drawer-close" class="p-2 rounded-md hover:bg-gray-100" aria-label="메뉴 닫기">
+        <svg class="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <nav class="p-4 space-y-2">
+      <a href="luck" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">위로와 행운</a>
+      <a href="fate" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">나의 사주는</a>
+      <a href="board" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">익명 게시판</a>
+      <a href="expert" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">전문가 상담</a>
+      <a href="solo" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">솔로는 여기</a>
+      <a href="money" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">돈되는 정보</a>
+      <a href="game" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">신나는 게임</a>
+      <a href="info" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">이용 안내</a>
+      <a href="#" id="share-btn" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">공유하기</a>
+    </nav>
+  </aside>
+
+  <!-- 공통 스크립트: 드로어 + 공유 (유지) -->
+  <script>
+    const menuBtn = document.getElementById('menu-btn');
+    const drawer = document.getElementById('drawer');
+    const drawerOverlay = document.getElementById('drawer-overlay');
+    const drawerClose = document.getElementById('drawer-close');
+    function openDrawer(){ drawer.classList.remove('translate-x-full'); drawerOverlay.classList.remove('hidden'); }
+    function closeDrawer(){ drawer.classList.add('translate-x-full'); drawerOverlay.classList.add('hidden'); }
+    menuBtn.addEventListener('click', openDrawer);
+    drawerOverlay.addEventListener('click', closeDrawer);
+    drawerClose.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeDrawer(); });
+
+    const shareBtn = document.getElementById('share-btn');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const shareData = { title:'혜숙이의 상담소', text:'다정한 AI 상담가 혜숙이와 대화해 보세요.', url:'https://hyesugi.com' };
+        try {
+          if (navigator.share) { await navigator.share(shareData); }
+          else {
+            await navigator.clipboard.writeText(shareData.url);
+            alert('링크가 클립보드에 복사되었습니다: ' + shareData.url);
+          }
+        } catch (err) {
+          console.error(err);
+          alert('공유에 실패했어요. 잠시 후 다시 시도해 주세요.');
+        }
+      });
+    }
+  </script>
+
+  <!-- ▼ 2048 게임 스크립트(원본 로직 유지) -->
+  <script>
+  (function(){
+    const SIZE = 4;
+    const boardEl = document.getElementById('board');
+    const scoreEl = document.getElementById('score');
+    const bestEl = document.getElementById('best');
+    const overlay = document.getElementById('overlay');
+    const ovTitle = document.getElementById('ovTitle');
+    const ovMsg = document.getElementById('ovMsg');
+    const statusEl = document.getElementById('status');
+    const newGameBtn = document.getElementById('newGame');
+    const retryBtn = document.getElementById('retry');
+    const undoBtn = document.getElementById('undoBtn');
+
+    // 페이지 스크롤 방지: 보드 내부 제스처만 막음
+    const stopScroll = (e) => { e.preventDefault(); };
+    ['touchstart','touchmove','wheel'].forEach(evt => {
+      boardEl.addEventListener(evt, stopScroll, { passive: false });
+    });
+
+    function buildCells(){
+      boardEl.innerHTML = '';
+      const frag = document.createDocumentFragment();
+      for (let r=0;r<SIZE;r++){
+        for (let c=0;c<SIZE;c++){
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          frag.appendChild(cell);
+        }
+      }
+      boardEl.appendChild(frag);
+    }
+
+    let grid, score, best, history = [];
+
+    function emptyGrid(){
+      return Array.from({length: SIZE}, () => Array(SIZE).fill(0));
+    }
+
+    function start(newSeed=true){
+      grid = emptyGrid();
+      score = 0;
+      updateScore(0);
+      if (newSeed){
+        addRandomTile(); addRandomTile();
+      }
+      history = [];
+      render();
+      hideOverlay();
+      focusBoard();
+    }
+
+    function focusBoard(){ boardEl.focus({preventScroll:true}); }
+
+    function updateScore(plus){
+      score += plus;
+      scoreEl.textContent = score;
+      best = Math.max(Number(localStorage.getItem('best2048')||'0'), score);
+      localStorage.setItem('best2048', best);
+      bestEl.textContent = best;
+    }
+
+    function randomEmptyCell(){
+      const empties = [];
+      for (let r=0;r<SIZE;r++) for (let c=0;c<SIZE;c++) if (grid[r][c]===0) empties.push([r,c]);
+      if (!empties.length) return null;
+      return empties[Math.floor(Math.random()*empties.length)];
+    }
+
+    function addRandomTile(){
+      const spot = randomEmptyCell();
+      if (!spot) return false;
+      const [r,c] = spot;
+      grid[r][c] = Math.random() < 0.9 ? 2 : 4;
+      return true;
+    }
+
+    function cloneGrid(g){ return g.map(row => row.slice()); }
+
+    function canMove(){
+      for (let r=0;r<SIZE;r++) for (let c=0;c<SIZE;c++) if (grid[r][c]===0) return true;
+      for (let r=0;r<SIZE;r++) for (let c=0;c<SIZE;c++){
+        const v = grid[r][c];
+        if (r+1<SIZE && grid[r+1][c]===v) return true;
+        if (c+1<SIZE && grid[r][c+1]===v) return true;
+      }
+      return false;
+    }
+
+    function move(dir){
+      const before = cloneGrid(grid);
+      let moved = false; let gained = 0;
+
+      function processLine(get, set){
+        const vals = [];
+        for (let i=0;i<SIZE;i++) vals.push(get(i));
+        const filtered = vals.filter(v => v!==0);
+        const merged = [];
+        for (let i=0;i<filtered.length;i++){
+          if (filtered[i+1] === filtered[i]){
+            const nv = filtered[i]*2; gained += nv; merged.push(nv); i++;
+          } else {
+            merged.push(filtered[i]);
+          }
+        }
+        while (merged.length < SIZE) merged.push(0);
+        for (let i=0;i<SIZE;i++) set(i, merged[i]);
+      }
+
+      if (dir==='left'){
+        for (let r=0;r<SIZE;r++){ processLine(i => grid[r][i], (i,v)=> grid[r][i]=v); }
+      } else if (dir==='right'){
+        for (let r=0;r<SIZE;r++){ processLine(i => grid[r][SIZE-1-i], (i,v)=> grid[r][SIZE-1-i]=v); }
+      } else if (dir==='up'){
+        for (let c=0;c<SIZE;c++){ processLine(i => grid[i][c], (i,v)=> grid[i][c]=v); }
+      } else if (dir==='down'){
+        for (let c=0;c<SIZE;c++){ processLine(i => grid[SIZE-1-i][c], (i,v)=> grid[SIZE-1-i][c]=v); }
+      }
+
+      moved = JSON.stringify(before)!==JSON.stringify(grid);
+      if (moved){
+        history.push({ grid: before, score });
+        if (history.length>50) history.shift();
+        updateScore(gained);
+        addRandomTile();
+        render();
+        if (!canMove()) showOverlay('게임 종료', '더 이상 이동할 수 없습니다.');
+      }
+      announce(dir, moved, gained);
+    }
+
+    function undo(){
+      const last = history.pop();
+      if (!last) return;
+      grid = cloneGrid(last.grid);
+      score = last.score;
+      scoreEl.textContent = score;
+      render();
+    }
+
+    function announce(dir, moved, gained){
+      const names = {left:'왼쪽', right:'오른쪽', up:'위', down:'아래'};
+      statusEl.textContent = moved ? `${names[dir]}으로 이동, +${gained}점` : `이동 없음`;
+    }
+
+    function hideOverlay(){ overlay.classList.remove('show'); }
+    function showOverlay(title,msg){ ovTitle.textContent=title; ovMsg.textContent=msg; overlay.classList.add('show'); }
+
+    function render(){
+      if (!boardEl.querySelector('.cell')) buildCells();
+      const old = boardEl.querySelector('.tile'); if (old) old.remove();
+      const layer = document.createElement('div'); layer.className = 'tile';
+
+      const g = getComputedStyle(boardEl);
+      const G = parseFloat(g.gap);
+      const P = parseFloat(g.padding);
+      const cols = SIZE; const rows = SIZE;
+      const rect = boardEl.getBoundingClientRect();
+      const innerW = rect.width - P*2 - G*(cols-1);
+      const innerH = rect.height - P*2 - G*(rows-1);
+      const cw = innerW / cols; const ch = innerH / rows;
+
+      for (let r=0;r<SIZE;r++) for (let c=0;c<SIZE;c++){
+        const v = grid[r][c]; if (!v) continue;
+        const tile = document.createElement('div');
+        tile.textContent = v;
+        tile.className = `n-${v}`;
+        tile.style.width = cw + 'px';
+        tile.style.height = ch + 'px';
+        tile.style.transform = `translate(${P + c*(cw+G)}px, ${P + r*(ch+G)}px)`;
+        layer.appendChild(tile);
+      }
+
+      boardEl.appendChild(layer);
+    }
+
+    const keyMap = {
+      'ArrowLeft':'left','a':'left','A':'left',
+      'ArrowRight':'right','d':'right','D':'right',
+      'ArrowUp':'up','w':'up','W':'up',
+      'ArrowDown':'down','s':'down','S':'down'
+    };
+    window.addEventListener('keydown', (e)=>{
+      const dir = keyMap[e.key];
+      if (dir){ e.preventDefault(); move(dir); }
+    }, { passive:false });
+
+    let touchStartX=0, touchStartY=0, touching=false;
+    const SWIPE_MIN = 18;
+    boardEl.addEventListener('touchstart', (e)=>{
+      if (!e.touches || !e.touches[0]) return;
+      touching = true;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive:false });
+    boardEl.addEventListener('touchmove', (e)=>{ if (touching) e.preventDefault(); }, { passive:false });
+    boardEl.addEventListener('touchend', (e)=>{
+      if (!touching) return; touching=false;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - touchStartX; const dy = t.clientY - touchStartY;
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE_MIN) return;
+      if (Math.abs(dx) > Math.abs(dy)) move(dx>0?'right':'left'); else move(dy>0?'down':'up');
+    }, { passive:false });
+
+    newGameBtn.addEventListener('click', () => window.location.reload());
+    retryBtn.addEventListener('click', ()=> start(true));
+    undoBtn.addEventListener('click', ()=> undo());
+
+    window.addEventListener('resize', ()=> render());
+
+    bestEl.textContent = Number(localStorage.getItem('best2048')||'0');
+    start(true);
+  })();
+  </script>
+
+  <footer id="site-footer" class="text-center text-sm text-gray-700 py-6">당신의 상담친구 혜숙이</footer>
+</body>
+</html>
