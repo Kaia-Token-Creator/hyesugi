@@ -60,7 +60,28 @@
 
     <!-- 공통 본문 컨테이너: 각 페이지는 여기만 수정 -->
     <main id="content" class="flex-1 p-4">
-      <!-- 페이지별 콘텐츠를 이 영역에 넣으세요 -->
+      <!-- ✅ CommonNinja 게시판 섹션 -->
+      <section class="mx-auto max-w-3xl">
+        <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow border border-white/60 p-5">
+          <header class="mb-3">
+            <h2 class="text-lg font-bold text-gray-900">익명 게시판</h2>
+            <p class="text-sm text-gray-700 mt-1">
+              편하게 털어놓고, 서로 따뜻하게 답해요. 예의와 배려를 지켜주세요. ✨
+            </p>
+          </header>
+
+          <!-- CommonNinja 위젯 -->
+          <div class="mt-4">
+            <div class="commonninja_component pid-02a75d8a-1abd-4141-b432-2c38276a8ebc"></div>
+          </div>
+
+          <noscript>
+            <p class="text-sm text-gray-700 mt-4">
+              자바스크립트가 비활성화되어 있어 게시판을 표시할 수 없습니다.
+            </p>
+          </noscript>
+        </div>
+      </section>
     </main>
   </div>
 
@@ -76,7 +97,7 @@
       </button>
     </div>
     <nav class="p-4 space-y-2">
-<a href="https://hyesugi.com" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">HOME</a>
+      <a href="https://hyesugi.com" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">HOME</a>
       <a href="https://hyesugi.com/luck" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">위로와 행운</a>
       <a href="https://hyesugi.com/fate" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">나의 사주는</a>
       <a href="https://hyesugi.com/board" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">익명 게시판</a>
@@ -136,7 +157,9 @@
     }
   </script>
 
-<footer id="site-footer" class="text-center text-sm text-gray-700 py-6">당신의 상담친구 혜숙이</footer>
+  <!-- ✅ CommonNinja SDK (필수) -->
+  <script src="https://cdn.commoninja.com/sdk/latest/commonninja.js" defer></script>
 
+  <footer id="site-footer" class="text-center text-sm text-gray-700 py-6">당신의 상담친구 혜숙이</footer>
 </body>
 </html>
