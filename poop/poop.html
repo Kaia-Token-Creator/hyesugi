@@ -7,18 +7,33 @@
   <style>
     html,body{margin:0;height:100%;background:#fff;overflow:hidden}
     body{display:flex;justify-content:center;align-items:stretch}
+
+    /* ▼ 높이 줄임: dvh 사용 + 안전한 범위로 clamp */
     .game-wrap{
-      position:relative;width:90vw;max-width:960px;min-width:360px;height:100svh;
+      position:relative;
+      width:90vw;max-width:960px;min-width:360px;
+      height:clamp(520px,78dvh,860px); /* ← 핵심 변경 (100svh 제거) */
       background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.06)
     }
+
     canvas{display:block;width:100%;height:100%;touch-action:none;background:#fff}
     .hud{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:center;gap:100px}
     .chip{background:rgba(0,0,0,.05);padding:6px 10px;border-radius:12px;font-weight:700}
     .startbtn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
       padding:12px 16px;border:1px solid #ddd;background:#fff;border-radius:12px;font-weight:700}
-    .pads{position:absolute;inset:auto 0 0 0;display:flex;height:28vh;opacity:.08}
+
+    /* ▼ 터치패드 높이도 축소 */
+    .pads{position:absolute;inset:auto 0 0 0;display:flex;height:20dvh;opacity:.08}
     .pad{flex:1;touch-action:manipulation}
     .hidden{display:none}
+
+    /* ▼ 작은 화면에서 더 타이트하게 */
+    @media (max-width: 420px){
+      .game-wrap{height:72dvh;}
+      .pads{height:18dvh;}
+      .chip{padding:5px 8px;font-size:13px}
+      .startbtn{transform:translate(-50%,-50%) scale(.95)}
+    }
   </style>
 </head>
 <body>
