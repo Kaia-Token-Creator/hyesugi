@@ -74,64 +74,103 @@
     <main id="content" class="flex-1 p-4">
       <!-- 🔮 나의 사주는: 입력 폼 -->
       <section class="mx-auto max-w-xl bg-white/70 backdrop-blur-sm rounded-2xl p-5 shadow">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">나의 사주는</h2>
+  <h2 class="text-lg font-bold text-gray-900 mb-4">나의 사주는 / 궁합</h2>
 
-        <form id="saju-form" class="space-y-4">
-          <div>
-            <label for="birthDate" class="block text-sm font-medium text-gray-800">생년월일 (양력)</label>
-            <input id="birthDate" name="birthDate" type="date" required
-                   class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black/30 bg-white" />
-          </div>
+  <!-- 모드 선택: 사주 / 궁합 -->
+  <div class="mb-4 flex rounded-full bg-white p-1 ring-1 ring-black/10 w-fit">
+    <button type="button" data-mode="saju"
+      class="mode-btn px-4 py-2 rounded-full text-sm font-semibold bg-black text-white">사주</button>
+    <button type="button" data-mode="match"
+      class="mode-btn px-4 py-2 rounded-full text-sm font-semibold text-gray-800">궁합</button>
+  </div>
 
-          <div class="flex items-center gap-3">
-            <div class="flex-1">
-              <label for="birthTime" class="block text-sm font-medium text-gray-800">출생 시간</label>
-              <input id="birthTime" name="birthTime" type="time" step="60"
-                     class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black/30 bg-white" />
-            </div>
-            <label class="mt-6 inline-flex items-center gap-2 select-none">
-              <input id="unknownTime" type="checkbox" class="w-4 h-4">
-              <span class="text-sm text-gray-800">모름</span>
-            </label>
-          </div>
+  <form id="saju-form" class="space-y-4">
+    <input type="hidden" id="mode" value="saju" />
 
-          <div>
-            <label for="timezone" class="block text-sm font-medium text-gray-800">시간대</label>
-            <select id="timezone" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-black/30">
-              <option value="Asia/Seoul" selected>Asia/Seoul (KST)</option>
-              <option value="UTC">UTC</option>
-              <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
-              <option value="America/Los_Angeles">America/Los_Angeles (PT)</option>
-            </select>
-          </div>
+    <!-- A(나) -->
+    <fieldset class="space-y-3">
+      <legend class="text-sm font-semibold text-gray-900">내 정보</legend>
 
-          <button id="saju-btn" type="submit"
-                  class="w-full rounded-full bg-black text-white font-semibold py-3 disabled:opacity-50 disabled:cursor-not-allowed">
-            나의 사주는
-          </button>
-        </form>
+      <div>
+        <label for="birthDate" class="block text-sm font-medium text-gray-800">생년월일 (양력)</label>
+        <input id="birthDate" name="birthDate" type="date" required
+               class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black/30 bg-white" />
+      </div>
 
-        <!-- 결과 영역 -->
-        <div id="result" class="mt-5 hidden">
-          <div id="loader" class="text-center text-sm text-gray-700">혜숙이가 사주를 풀이하고 있어요 조금만 기다려 주세요...</div>
-          <article id="answer" class="prose prose-sm max-w-none hidden bg-[#fff6cc] border border-yellow-300 rounded-xl p-4 leading-relaxed"></article>
-
-          <!-- ✅ 공유 버튼 묶음 (결과가 나왔을 때 노출/활성) -->
-          <div class="mt-3 flex items-center gap-2 justify-end">
-            <button id="btn-share-content"
-                    class="px-4 py-2 rounded-full bg-black text-white text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled>
-              내용 공유하기
-            </button>
-            <button id="btn-share-link"
-                    class="px-4 py-2 rounded-full border border-gray-800 text-gray-900 bg-white text-sm font-semibold">
-              친구야 너도 봐봐
-            </button>
-          </div>
+      <div class="flex items-center gap-3">
+        <div class="flex-1">
+          <label for="birthTime" class="block text-sm font-medium text-gray-800">출생 시간</label>
+          <input id="birthTime" name="birthTime" type="time" step="60"
+                 class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black/30 bg-white" />
         </div>
+        <label class="mt-6 inline-flex items-center gap-2 select-none">
+          <input id="unknownTime" type="checkbox" class="w-4 h-4">
+          <span class="text-sm text-gray-800">모름</span>
+        </label>
+      </div>
+    </fieldset>
 
-        <p class="mt-4 text-xs text-gray-700">※ 사주 해석은 참고용입니다. 의료·법률·재정 자문이 아니며, 중요한 결정은 신중히 판단하세요.</p>
-      </section>
+    <!-- B(상대) — 궁합 모드에서만 표시 -->
+    <fieldset id="partner-fields" class="space-y-3 hidden">
+      <legend class="text-sm font-semibold text-gray-900">상대 정보</legend>
+
+      <div>
+        <label for="birthDate2" class="block text-sm font-medium text-gray-800">생년월일 (양력)</label>
+        <input id="birthDate2" name="birthDate2" type="date"
+               class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black/30 bg-white" />
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="flex-1">
+          <label for="birthTime2" class="block text-sm font-medium text-gray-800">출생 시간</label>
+          <input id="birthTime2" name="birthTime2" type="time" step="60"
+                 class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black/30 bg-white" />
+        </div>
+        <label class="mt-6 inline-flex items-center gap-2 select-none">
+          <input id="unknownTime2" type="checkbox" class="w-4 h-4">
+          <span class="text-sm text-gray-800">모름</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <!-- 타임존(공통) -->
+    <div>
+      <label for="timezone" class="block text-sm font-medium text-gray-800">시간대</label>
+      <select id="timezone" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-black/30">
+        <option value="Asia/Seoul" selected>Asia/Seoul (KST)</option>
+        <option value="UTC">UTC</option>
+        <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+        <option value="America/Los_Angeles">America/Los_Angeles (PT)</option>
+      </select>
+    </div>
+
+    <button id="saju-btn" type="submit"
+            class="w-full rounded-full bg-black text-white font-semibold py-3 disabled:opacity-50 disabled:cursor-not-allowed">
+      나의 사주는
+    </button>
+  </form>
+
+  <!-- 결과 -->
+  <div id="result" class="mt-5 hidden">
+    <div id="loader" class="text-center text-sm text-gray-700">혜숙이가 풀이 중입니다. 잠시만요…</div>
+    <article id="answer" class="prose prose-sm max-w-none hidden bg-[#fff6cc] border border-yellow-300 rounded-xl p-4 leading-relaxed"></article>
+
+    <div class="mt-3 flex items-center gap-2 justify-end">
+      <button id="btn-share-content"
+              class="px-4 py-2 rounded-full bg-black text-white text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled>
+        내용 공유하기
+      </button>
+      <button id="btn-share-link"
+              class="px-4 py-2 rounded-full border border-gray-800 text-gray-900 bg-white text-sm font-semibold">
+        친구야 너도 봐봐
+      </button>
+    </div>
+  </div>
+
+  <p class="mt-4 text-xs text-gray-700">※ 해석은 참고용입니다. 의료·법률·재정 자문이 아니며, 중요한 결정은 신중히 판단하세요.</p>
+</section>
+
     </main>
   </div>
 
@@ -206,152 +245,209 @@
       });
     }
 
-    // === 사주 폼 로직 ===
-    const API_ENDPOINT = "/api/chat"; // /functions/api/chat.js -> /api/chat 로 라우팅
-    const form = document.getElementById('saju-form');
-    const birthTime = document.getElementById('birthTime');
-    const unknownTime = document.getElementById('unknownTime');
-    const resultBox = document.getElementById('result');
-    const loader = document.getElementById('loader');
-    const answer = document.getElementById('answer');
+    <script>
+  // === Drawer 토글(기존 유지) 위쪽 코드 그대로 ===
 
-    // ✅ 새로 추가: 공유 버튼 참조
-    const shareContentBtn = document.getElementById('btn-share-content');
-    const shareLinkBtn = document.getElementById('btn-share-link');
+  // === 사주/궁합 폼 로직 ===
+  const API_ENDPOINT = "/api/chat";
 
-    unknownTime.addEventListener('change', () => {
-      birthTime.disabled = unknownTime.checked;
-      if (unknownTime.checked) birthTime.value = "";
+  // 모드 전환
+  const modeBtns = document.querySelectorAll('.mode-btn');
+  const modeInput = document.getElementById('mode');
+  const partnerFields = document.getElementById('partner-fields');
+  const submitBtn = document.getElementById('saju-btn');
+
+  modeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      modeBtns.forEach(b => b.classList.remove('bg-black','text-white'));
+      btn.classList.add('bg-black','text-white');
+      modeInput.value = btn.dataset.mode;
+
+      const isMatch = modeInput.value === 'match';
+      partnerFields.classList.toggle('hidden', !isMatch);
+      submitBtn.textContent = isMatch ? '우리의 궁합은' : '나의 사주는';
     });
+  });
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+  // 입력 요소
+  const form = document.getElementById('saju-form');
+  const birthTime = document.getElementById('birthTime');
+  const unknownTime = document.getElementById('unknownTime');
+  const birthTime2 = document.getElementById('birthTime2');
+  const unknownTime2 = document.getElementById('unknownTime2');
 
-      const date = document.getElementById('birthDate').value; // yyyy-mm-dd
-      const time = unknownTime.checked || !birthTime.value ? "모름" : birthTime.value; // HH:MM or '모름'
-      const tz = document.getElementById('timezone').value;
+  const resultBox = document.getElementById('result');
+  const loader = document.getElementById('loader');
+  const answer = document.getElementById('answer');
 
-      // UX: 로딩 상태
-      resultBox.classList.remove('hidden');
-      answer.classList.add('hidden');
-      loader.classList.remove('hidden');
-      form.querySelector('button[type="submit"]').disabled = true;
-      // 결과 공유 버튼 비활성화
-      if (shareContentBtn) shareContentBtn.disabled = true;
+  const shareContentBtn = document.getElementById('btn-share-content');
+  const shareLinkBtn = document.getElementById('btn-share-link');
 
-      // DeepSeek Chat Completions 페이로드
-      const payload = {
-        model: "deepseek-chat",
-        temperature: 0.7,
-        messages: [
-          {
-            role: "system",
-            content:
-`너는 '혜숙이'라는 다정한 사주 해석가야.
-- 친근하고 공감되는 말투로 한국어로만 사주풀이를 해.
-- 전문용어가 나오면 쉬운 말로 풀이를 덧붙여.
-- 과도한 단정 대신 '가능성이 높다', '경향'처럼 표현해.
-- 해석 후 오늘부터 실천할 수 있는 간단한 조언 3가지를 bullet로 제시해.`
-          },
-          {
-            role: "user",
-            content:
-`다음 정보를 기준으로 한국식 사주(사주팔자) 느낌의 성향·강점·주의점·올해 흐름을 간단히 풀이해줘.
-- 양력 생년월일: ${date}
-- 출생시간: ${time}
-- 시간대(Timezone): ${tz}
+  // 시간 모름 처리
+  unknownTime.addEventListener('change', () => {
+    birthTime.disabled = unknownTime.checked;
+    if (unknownTime.checked) birthTime.value = "";
+  });
+  if (unknownTime2) {
+    unknownTime2.addEventListener('change', () => {
+      birthTime2.disabled = unknownTime2.checked;
+      if (unknownTime2.checked) birthTime2.value = "";
+    });
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const mode = modeInput.value; // 'saju' | 'match'
+
+    // A(나)
+    const dateA = document.getElementById('birthDate').value;
+    const timeA = unknownTime.checked || !birthTime.value ? "모름" : birthTime.value;
+
+    // B(상대, 궁합일 때만)
+    const dateB = document.getElementById('birthDate2')?.value || "";
+    const timeB = (unknownTime2?.checked || !birthTime2?.value) ? "모름" : (birthTime2?.value || "");
+
+    const tz = document.getElementById('timezone').value;
+
+    // 간단 검증
+    if (!dateA) {
+      alert("내 생년월일을 입력해 주세요.");
+      return;
+    }
+    if (mode === 'match' && !dateB) {
+      alert("상대의 생년월일을 입력해 주세요.");
+      return;
+    }
+
+    // UX: 로딩
+    resultBox.classList.remove('hidden');
+    answer.classList.add('hidden');
+    loader.classList.remove('hidden');
+    submitBtn.disabled = true;
+    if (shareContentBtn) shareContentBtn.disabled = true;
+
+    // DeepSeek payload 구성
+    const baseSystem = `
+너는 '혜숙이'라는 다정한 해석가야.
+- 한국어만 사용해.
+- 전문용어 뒤엔 쉬운 풀이를 덧붙여.
+- 과도한 단정보다 '경향/가능성' 위주로.
+`;
+
+    const userForSaju = `
+다음 정보를 기준으로 성향·강점·주의점·올해 흐름을 간단히 풀이해줘.
+- 양력 생년월일: ${dateA}
+- 출생시간: ${timeA}
+- 시간대: ${tz}
 주의:
 1) 출생시간이 '모름'이면 시간 해석은 일반화해서 말해줘.
-2) 점술·의료·법률 확정 조언은 피하고, 실천 팁 위주로 마무리해줘.
-3) 섣간 단정 대신 다양한 가능성을 함께 제시해줘.`
-          }
-        ]
-      };
+2) 점술·의료·법률 확정 조언은 피하고, 실천 팁 위주로.
+3) 섣부른 단정 대신 다양한 가능성을 함께 제시.
+마무리에 오늘부터 실천할 수 있는 간단한 조언 3가지를 bullet로 제시.`;
 
+    const userForMatch = `
+두 사람의 궁합을 아래 정보로 풀이해줘.
+A(나)
+- 양력 생년월일: ${dateA}
+- 출생시간: ${timeA}
+
+B(상대)
+- 양력 생년월일: ${dateB}
+- 출생시간: ${timeB}
+
+공통
+- 시간대: ${tz}
+
+원하는 출력:
+1) 기본 성향 비교 & 잘 맞는 지점
+2) 보완/시너지 포인트
+3) 갈등이 생기기 쉬운 상황과 완화 팁
+4) 소통/데이트/일상에서의 실천 조언 5가지 (bullet)
+주의: 확정적 예언 금지, 가능성과 경향 위주. 상대를 존중하는 톤.`;
+
+    const payload = {
+      model: "deepseek-chat",
+      temperature: 0.7,
+      messages: [
+        { role: "system", content: baseSystem.trim() },
+        { role: "user", content: (mode === 'match' ? userForMatch : userForSaju).trim() }
+      ]
+    };
+
+    try {
+      const res = await fetch(API_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      let text = "";
+      if (data?.choices?.[0]?.message?.content) text = data.choices[0].message.content;
+      else if (data?.choices?.[0]?.text) text = data.choices[0].text;
+      else if (typeof data === "string") text = data;
+      else text = "응답 형식을 이해하지 못했어요. 잠시 후 다시 시도해 주세요.";
+
+      loader.classList.add('hidden');
+      answer.classList.remove('hidden');
+      answer.textContent = text;
+
+      if (shareContentBtn) shareContentBtn.disabled = !text?.trim();
+
+    } catch (err) {
+      console.error(err);
+      loader.classList.add('hidden');
+      answer.classList.remove('hidden');
+      answer.textContent = "요청 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요.";
+      if (shareContentBtn) shareContentBtn.disabled = true;
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+
+  // 공유 버튼(기존 로직 유지)
+  const answerEl = document.getElementById('answer');
+  const shareContentBtn2 = document.getElementById('btn-share-content');
+  const shareLinkBtn2 = document.getElementById('btn-share-link');
+
+  if (shareContentBtn2) {
+    shareContentBtn2.addEventListener('click', async () => {
+      const text = (answerEl.textContent || "").trim();
+      if (!text) return;
+      const watermark = "\n\n— https://hyesugi.com/fate";
+      const shareData = { title: "혜숙이의 풀이", text: text + watermark };
       try {
-        const res = await fetch(API_ENDPOINT, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-
-        // DeepSeek 응답 형태 가드: chat.completions 또는 completions
-        let text = "";
-        if (data?.choices?.[0]?.message?.content) {
-          text = data.choices[0].message.content;
-        } else if (data?.choices?.[0]?.text) {
-          text = data.choices[0].text;
-        } else if (typeof data === "string") {
-          text = data;
-        } else {
-          text = "응답 형식을 이해하지 못했어요. 잠시 후 다시 시도해 주세요.";
+        if (navigator.share) await navigator.share(shareData);
+        else {
+          await navigator.clipboard.writeText(shareData.text);
+          alert("풀이 내용이 복사되었어요. 원하는 곳에 붙여넣기 하세요!");
         }
-
-        loader.classList.add('hidden');
-        answer.classList.remove('hidden');
-        answer.textContent = text;
-
-        // ✅ 결과가 준비되면 '내용 공유하기' 활성화
-        if (shareContentBtn) shareContentBtn.disabled = !text?.trim();
-
       } catch (err) {
         console.error(err);
-        loader.classList.add('hidden');
-        answer.classList.remove('hidden');
-        answer.textContent = "사주 요청 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요.";
-        if (shareContentBtn) shareContentBtn.disabled = true;
-      } finally {
-        form.querySelector('button[type="submit"]').disabled = false;
+        alert("공유/복사에 실패했어요. 잠시 후 다시 시도해 주세요.");
       }
     });
+  }
 
-    // ✅ 새로 추가: 공유 버튼 동작
-    if (shareContentBtn) {
-      shareContentBtn.addEventListener('click', async () => {
-        const text = (answer.textContent || "").trim();
-        if (!text) return;
-        const watermark = "\n\n— https://hyesugi.com/fate";
-        const shareData = {
-          title: "혜숙이의 사주 풀이",
-          text: text + watermark
-        };
-        try {
-          if (navigator.share) {
-            await navigator.share(shareData);
-          } else {
-            await navigator.clipboard.writeText(shareData.text);
-            alert("풀이 내용이 복사되었어요. 원하는 곳에 붙여넣기 하세요!");
-          }
-        } catch (err) {
-          console.error(err);
-          alert("공유/복사에 실패했어요. 잠시 후 다시 시도해 주세요.");
+  if (shareLinkBtn2) {
+    shareLinkBtn2.addEventListener('click', async () => {
+      const url = "https://hyesugi.com/fate";
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: "혜숙이의 사주", text: "친구야 너도 봐봐", url });
+        } else {
+          await navigator.clipboard.writeText(url);
+          alert("링크가 복사되었어요: " + url);
         }
-      });
-    }
+      } catch (err) {
+        console.error(err);
+        alert("공유/복사에 실패했어요. 잠시 후 다시 시도해 주세요.");
+      }
+    });
+  }
+</script>
 
-    if (shareLinkBtn) {
-      shareLinkBtn.addEventListener('click', async () => {
-        const url = "https://hyesugi.com/fate";
-        try {
-          if (navigator.share) {
-            await navigator.share({
-              title: "혜숙이의 사주",
-              text: "친구야 너도 봐봐",
-              url
-            });
-          } else {
-            await navigator.clipboard.writeText(url);
-            alert("링크가 복사되었어요: " + url);
-          }
-        } catch (err) {
-          console.error(err);
-          alert("공유/복사에 실패했어요. 잠시 후 다시 시도해 주세요.");
-        }
-      });
-    }
-  </script>
 
   <footer id="site-footer" class="text-center text-sm text-gray-700 py-6">
   <a href="https://hyesugi.com/donation" target="_blank" rel="noopener noreferrer"
