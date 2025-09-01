@@ -71,6 +71,35 @@
 
     <!-- 본문: poop iframe만 삽입 -->
     <main id="content" class="flex-1 p-4">
+<div class="text-right">
+  <button id="share-poop"
+    class="px-4 py-2 bg-black text-white rounded-full text-sm font-semibold hover:bg-gray-800">
+    게임공유하기 🔗
+  </button>
+</div>
+
+<script>
+  document.getElementById("share-poop").addEventListener("click", async () => {
+    const shareData = {
+      title: "똥피하기 게임",
+      text: "같이 똥 피해보자!",
+      url: "https://hyesugi.com/poop/"
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        alert("링크가 클립보드에 복사되었습니다: " + shareData.url);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("공유에 실패했어요. 잠시 후 다시 시도해 주세요.");
+    }
+  });
+</script>
+
+
       <section class="py-2">
         <iframe
           src="https://hyesugi.com/poop/poop.html"
