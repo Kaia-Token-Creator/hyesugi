@@ -208,6 +208,42 @@
     }
   </script>
 
-  <footer id="site-footer" class="text-center text-sm text-gray-700 py-6">당신의 상담친구 혜숙이</footer>
+<footer id="site-footer" class="text-center text-sm text-gray-700 py-6 space-y-2">
+  <!-- ☕ 고정 첫 줄 -->
+  <div>
+    <a href="https://hyesugi.com/donation" target="_blank" rel="noopener noreferrer"
+       class="text-black font-semibold hover:underline">
+       혜숙이에게 커피 한잔 사주기 ☕
+    </a>
+  </div>
+
+  <!-- 연한 구분선 -->
+  <hr class="border-t border-gray-300 opacity-50 w-2/3 mx-auto">
+
+  <!-- 🔀 랜덤 광고 줄 -->
+  <div id="ad-slot"></div>
+</footer>
+
+<script>
+  const ads = [
+    { text: "인터넷 바꾸면 47만원 지급해드려요!", url: "https://iryan.kr/t73750ushf" },
+    { text: "1시간 투자, 월평균 148만원 버는 고효율 부업", url: "https://iryan.kr/t738hkv2k0" },
+    { text: "넷플릭스 글로벌 컨텐츠 잠금해제하는 방법", url: "https://hyesugi.com/vpn" },
+    { text: "인간으로 살아남기", url: "https://hyesugi.com/world" }
+  ];
+
+  const pick = ads[Math.floor(Math.random() * ads.length)];
+  const slot = document.getElementById("ad-slot");
+  if (slot) {
+    const a = document.createElement("a");
+    a.href = pick.url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.className = "text-blue-600 font-bold underline";
+    a.textContent = pick.text;
+    slot.replaceChildren(a);
+  }
+</script>
+
 </body>
 </html>
