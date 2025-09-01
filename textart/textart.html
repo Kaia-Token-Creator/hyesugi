@@ -9,64 +9,111 @@
 
 <style>
   :root{
-    --bg:#0b0f14; --panel:#111823; --text:#e5eef7; --muted:#94a3b8; --accent:#4f9cf9; --border:#1e293b
+    --bg:#9bbbd4;     /* 전체 배경 */
+    --panel:#9bbbd4;  /* 패널 배경도 동일 */
+    --text:#000000;   /* 기본 텍스트 */
+    --muted:#000000;  /* 보조 텍스트도 검정 */
+    --accent:#000000; /* 강조색도 검정 */
+    --border:#000000; /* 테두리도 검정 */
   }
   *{box-sizing:border-box}
   body{
-    margin:0; background:var(--bg); color:var(--text);
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
     font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace
   }
   .wrap{max-width:940px;margin:0 auto;padding:16px}
   header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px}
   .title{font-weight:800;font-size:18px}
   .sharebar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px}
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:14px;
+    color:var(--text);
+  }
+
   .grid{display:grid;gap:12px}
   @media(min-width:960px){.grid{grid-template-columns:360px 1fr}}
 
-  /* 업로드 영역 */
   .drop{
-    border:2px dashed #334155;border-radius:12px;padding:18px;text-align:center;
-    background:#0f172a55; cursor:pointer; user-select:none
+    border:2px dashed var(--border);
+    border-radius:12px;
+    padding:18px;
+    text-align:center;
+    background:var(--bg);
+    cursor:pointer;
+    user-select:none
   }
   .drop:hover{border-color:var(--accent)}
   .drop strong.underline{ text-decoration: underline; }
 
   .hint{color:var(--muted);font-size:12px}
-  .notice{margin-top:10px;padding:10px;border:1px dashed #2b3b55;border-radius:10px;background:#0f172a88}
+  .notice{
+    margin-top:10px;
+    padding:10px;
+    border:1px dashed var(--border);
+    border-radius:10px;
+    background:var(--bg)
+  }
 
-  /* 컨트롤 - 한 줄에 하나씩 */
   .control{
     display:flex; flex-direction:column; gap:8px;
-    margin:12px 0; padding:10px; border:1px solid var(--border); border-radius:10px; background:#0f172a66
+    margin:12px 0; padding:10px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--bg);
+    color:var(--text);
   }
   .control label{font-size:12px;color:var(--muted)}
-  .control input[type="range"], .control select, .control input[type="color"], .control input[type="text"]{width:100%}
+  .control input[type="range"],
+  .control select,
+  .control input[type="color"],
+  .control input[type="text"]{width:100%; color:var(--text); background:var(--bg); border:1px solid var(--border)}
 
   .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-  button{
-    background:#1e293b;color:#dbeafe;border:1px solid #2b3b55;
-    padding:11px 14px;border-radius:10px;font-weight:700;cursor:pointer
-  }
-  button.primary{background:linear-gradient(180deg,#3b82f6,#2563eb);color:#fff}
-  button:disabled{opacity:.55;cursor:not-allowed}
-  .iconbtn{display:inline-flex;align-items:center;gap:6px}
+button{
+  background:#FFCD50;   /* 노란색 배경 */
+  color:#000000;        /* 글씨는 검정 */
+  border:1px solid #000000;
+  padding:11px 14px;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
+}
+button.primary{
+  background:#FFCD50;   /* primary도 동일하게 */
+  color:#000000;
+}
+button:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+
 
   pre#ascii{
-    margin:0; white-space:pre; overflow:auto; background:#000; color:#fff;
-    padding:12px; border-radius:12px; line-height:1em; min-height:200px
+    margin:0;
+    white-space:pre;
+    overflow:auto;
+    background:var(--bg);
+    color:var(--text);
+    padding:12px;
+    border-radius:12px;
+    line-height:1em;
+    min-height:200px
   }
 
-  /* ✅ 메시지를 마지막 줄 '아래' 우측 정렬로 표시 */
   .msg-below{
     margin-top:6px;
     text-align:right;
     font-weight:700;
-    color:#fff;
+    color:var(--text);
     white-space:pre;
   }
 
-  /* 모바일 여백 조금 더 */
   @media(max-width:480px){
     .control{margin:10px 0; padding:10px}
     .btns{gap:10px}
