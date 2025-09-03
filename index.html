@@ -7,10 +7,13 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
+
   gtag('config', 'G-QR5TWB3RYJ');
 </script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9891583086388017" crossorigin="anonymous"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9891583086388017"
+     crossorigin="anonymous"></script>
 
+<!-- 기본 설정 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>혜숙이, 마음의 쉼터</title>
@@ -24,7 +27,7 @@
 <link rel="apple-touch-icon" href="https://hyesugi.com/apple-touch-icon.png" sizes="180x180" />
 <link rel="manifest" href="https://hyesugi.com/site.webmanifest" />
 
-<!-- Open Graph -->
+<!-- Open Graph (Facebook, Kakao, Slack 등) -->
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="hyesugi.com" />
 <meta property="og:url" content="https://hyesugi.com/" />
@@ -43,155 +46,221 @@
 
 <link rel="preload" as="image" href="https://hyesugi.com/preview.jpg" imagesrcset="https://hyesugi.com/preview.jpg" />
 
-<!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com"></script>
+<style>
+    #chat-container::-webkit-scrollbar { width: 8px; }
+    #chat-container::-webkit-scrollbar-track { background: #f1f1f1; }
+    #chat-container::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+    #chat-container::-webkit-scrollbar-thumb:hover { background: #555; }
+</style>
 </head>
 <body class="bg-white font-sans">
-  <div id="app" class="flex flex-col min-h-screen max-w-3xl mx-auto bg-[#9bbbd4]">
+<div id="app" class="flex flex-col h-screen max-w-3xl mx-auto bg-[#9bbbd4]">
 
-    <!-- Header + 햄버거 메뉴 버튼 -->
-    <header class="bg-white/30 backdrop-blur-sm text-center py-4 shadow-md relative">
-      <h1 class="text-xl font-bold text-gray-800 flex items-center justify-center gap-2">
-        <a href="https://hyesugi.com" class="flex items-center justify-center gap-2" aria-label="hyesugi.com으로 이동">
-          <img src="https://hyesugi.com/hyesugi.jpg" alt="혜숙이" class="w-14 h-14 rounded-full object-cover">
-          당신의 상담친구 혜숙이
-        </a>
-      </h1>
-      <p class="text-sm text-gray-600">우측 메뉴를 눌러보세요</p>
+<!-- Header + 햄버거 메뉴 버튼 -->
+<header class="bg-white/30 backdrop-blur-sm text-center py-4 shadow-md relative">
+  <h1 class="text-xl font-bold text-gray-800 flex items-center justify-center gap-2">
+    <a href="https://hyesugi.com" class="flex items-center justify-center gap-2" aria-label="hyesugi.com으로 이동">
+      <img src="https://hyesugi.com/hyesugi.jpg" alt="혜숙이" class="w-14 h-14 rounded-full object-cover">
+      당신의 상담친구 혜숙이
+    </a>
+  </h1>
+  <p class="text-sm text-gray-600">우측 메뉴를 눌러보세요</p>
 
-      <!-- 햄버거 버튼 -->
-      <button id="menu-btn" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-white/60 focus:outline-none focus:ring-2 focus:ring-black/40" aria-label="메뉴 열기">
-        <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
-        </svg>
-      </button>
-    </header>
+  <!-- 햄버거 버튼 -->
+  <button id="menu-btn" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-white/60 focus:outline-none focus:ring-2 focus:ring-black/40" aria-label="메뉴 열기">
+    <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
+    </svg>
+  </button>
+</header>
 
-    <!-- 공통 본문 컨테이너: 각 페이지는 여기만 수정 -->
-    <main id="content" class="flex-1 p-4">
-      <!-- ▼ 말풍선 섹션 -->
-
-<div class="flex justify-center my-6">
-  <img src="https://hyesugi.com/donation/coffee.jpg" alt="혜숙이" class="w-40 h-40 rounded-full shadow-lg">
+<!-- Chat Container -->
+<div id="chat-container" class="flex-1 p-4 overflow-y-auto space-y-4">
+    <div class="flex justify-start">
+        <div class="bg-white rounded-lg p-3 max-w-xs md:max-w-md shadow">
+            <p class="text-gray-800">안녕하세요, 혜숙이에요. 어떤 고민이 있으신가요? 당신의 이야기를 들어줄게요. 가정/학업/이성/금전/마음상태 뭐든지 편하게 말씀해주세요.</p>
+        </div>
+    </div>
 </div>
 
-      <section class="mx-auto max-w-2xl space-y-3">
-        <div class="bg-[#F7E600] text-gray-900 rounded-2xl shadow p-4 leading-relaxed">
-          혜숙이의 상담 서비스는 모두 무료로 제공됩니다
+<div id="loading" class="hidden flex items-center justify-start p-4">
+    <div class="flex items-center space-x-2">
+        <div class="bg-white rounded-lg p-3 shadow flex items-center space-x-2">
+            <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: -0.3s;"></div>
+            <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: -0.15s;"></div>
+            <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
         </div>
-
-        <div class="bg-[#F7E600] text-gray-900 rounded-2xl shadow p-4 leading-relaxed">
-          혜숙이는 혼자 속앓는 우리 아이들, 내 편없는 서글픈 청년들, 말동무 없이 외로운 우리 아버지 어머니들을 위로하고 공감해주는 친구이자 가족이 되기 위해 탄생했습니다.
-        </div>
-
-        <div class="bg-[#F7E600] text-gray-900 rounded-2xl shadow p-4 leading-relaxed">
-          혜숙이와의 대화에 위안 받았다면, 마음의 짐이 조금이라도 덜어지셨다면<br>
-          그것만으로 너무 감사해요!<br>
-          혜숙이가 존재하는 이유니까요
-        </div>
-
-        <div class="bg-[#F7E600] text-gray-900 rounded-2xl shadow p-4 leading-relaxed">
-          기술의 발전은 항상 사람을 따뜻한 시선으로 바라보며 이루어져야하고<br>
-          그 힘이 모두에게 고루 닿아야 한다고 믿어요
-        </div>
-
-        <div class="bg-[#F7E600] text-gray-900 rounded-2xl shadow p-4 leading-relaxed">
-          혜숙이, 부족하고 느려도 항상 그런 마음 지니고 발전해가겠습니다<br><br>
-          마음에 힘이 되셨다니 제가 더 감사드리고 제가 더 힘이 납니다<br>
-          더 좋은 운영을 위해<br>
-          혜숙이에게 커피 한잔 ☕ 사주기 링크⬇️
-          <a href="https://open.kakao.com/me/hyesugi" target="_blank" rel="noopener noreferrer"
-             class="mt-2 inline-flex items-center justify-center w-full rounded-xl bg-black text-white px-4 py-3 font-semibold hover:opacity-90">
-            카카오 오픈채팅에서<br>☕ 혜숙이에게 커피 한 잔 사주기
-          </a>
-          <p class="mt-2 text-sm">
-            위 링크의 카카오 오픈채팅에서 ‘송금하기’로 커피 한잔 ☕ 값까지만 받겠습니다<br>
-꼭 응원(이게 더 중요!)의 말과 함께!
-          </p>
-        </div>
-
-        <div class="bg-[#F7E600] text-gray-900 rounded-2xl shadow p-4 leading-relaxed">
-          커피 한잔 ☕의 후원 감사히 받고 힘낼게요!<br>
-          모두들 지치고 어려운 시기이지만 같이 이겨내자구요!<br>
-          혜숙이가 언제나 당신 마음의 쉼터가 되겠습니다
-        </div>
-      </section>
-      <!-- ▲ 말풍선 섹션 -->
-    </main>
-  </div>
-
-  <!-- Overlay & Drawer -->
-  <div id="drawer-overlay" class="fixed inset-0 bg-black/30 hidden z-40"></div>
-  <aside id="drawer" class="fixed right-0 top-0 h-full w-1/2 max-w-md bg-white shadow-xl translate-x-full transition-transform duration-300 z-50">
-    <div class="flex items-center justify-between p-4 border-b">
-      <h2 class="font-bold text-gray-800">메뉴</h2>
-      <button id="drawer-close" class="p-2 rounded-md hover:bg-gray-100" aria-label="메뉴 닫기">
-        <svg class="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
     </div>
-    <nav class="p-4 space-y-2">
-      <a href="https://hyesugi.com" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">HOME</a>
-      <a href="https://hyesugi.com/luck" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">위로와 행운</a>
-      <a href="https://hyesugi.com/fate" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">사주와 궁합</a>
-      <a href="https://hyesugi.com/board" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">익명 게시판</a>
-      <a href="https://hyesugi.com/expert" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">전문가 상담</a>
-      <a href="https://hyesugi.com/solo" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">솔로는 여기</a>
-      <a href="https://hyesugi.com/money" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">돈되는 정보</a>
-      <a href="https://hyesugi.com/game" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">신나는 게임</a>
-      <a href="https://hyesugi.com/info" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">이용 안내</a>
-      <a href="#" id="share-btn" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">공유하기</a>
-    </nav>
-  </aside>
+</div>
 
-  <!-- 공통 스크립트: 드로어 + 공유만 유지 -->
-  <script>
-    // === Drawer Toggle ===
-    const menuBtn = document.getElementById('menu-btn');
-    const drawer = document.getElementById('drawer');
-    const drawerOverlay = document.getElementById('drawer-overlay');
-    const drawerClose = document.getElementById('drawer-close');
+<!-- Footer -->
+<footer class="p-4 bg-white/30 backdrop-blur-sm">
+    <div class="relative flex items-center">
+        <input type="text" id="user-input" class="w-full bg-white rounded-full py-3 pl-5 pr-14 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner" placeholder="메시지를 입력하세요...">
+        <button id="send-button" class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+    </div>
+</footer>
+</div>
 
-    function openDrawer() {
-      drawer.classList.remove('translate-x-full');
-      drawerOverlay.classList.remove('hidden');
-    }
-    function closeDrawer() {
-      drawer.classList.add('translate-x-full');
-      drawerOverlay.classList.add('hidden');
-    }
-    menuBtn.addEventListener('click', openDrawer);
-    drawerOverlay.addEventListener('click', closeDrawer);
-    drawerClose.addEventListener('click', closeDrawer);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
+<!-- Overlay & Drawer -->
+<div id="drawer-overlay" class="fixed inset-0 bg-black/30 hidden z-40"></div>
+<aside id="drawer" class="fixed right-0 top-0 h-full w-1/2 max-w-md bg-white shadow-xl translate-x-full transition-transform duration-300 z-50">
+  <div class="flex items-center justify-between p-4 border-b">
+    <h2 class="font-bold text-gray-800">메뉴</h2>
+    <button id="drawer-close" class="p-2 rounded-md hover:bg-gray-100" aria-label="메뉴 닫기">
+      <svg class="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+  <nav class="p-4 space-y-2">
+    <a href="luck" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">위로와 행운</a>
+    <a href="fate" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">사주와 궁합</a>
+    <a href="board" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">익명 게시판</a>
+<a href="expert" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">전문가 상담</a>
+<a href="solo" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">솔로는 여기</a>
+<a href="money" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">돈되는 정보</a>
+<a href="game" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">신나는 게임</a>
+<a href="info" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">이용 안내</a>
+<a href="#" id="share-btn" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">공유하기</a>
 
-    // === Share Button ===
-    const shareBtn = document.getElementById('share-btn');
-    if (shareBtn) {
-      shareBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const shareData = {
-          title: '혜숙이의 상담소',
-          text: '다정한 AI 상담가 혜숙이와 대화해 보세요.',
-          url: 'https://hyesugi.com'
-        };
-        try {
-          if (navigator.share) {
-            await navigator.share(shareData);
-          } else {
-            await navigator.clipboard.writeText(shareData.url);
-            alert('링크가 클립보드에 복사되었습니다: ' + shareData.url);
-          }
-        } catch (err) {
-          console.error(err);
-          alert('공유에 실패했어요. 잠시 후 다시 시도해 주세요.');
+  </nav>
+</aside>
+
+<script>
+const chatContainer = document.getElementById('chat-container');
+const userInput = document.getElementById('user-input');
+const sendButton = document.getElementById('send-button');
+const loadingIndicator = document.getElementById('loading');
+
+// 대화 기록 저장
+let conversationHistory = [];
+
+// 시스템 메시지
+const systemMessage = {
+    role: 'system',
+    content: "You are '혜숙이', a professional counselor and a warm-hearted friend. Your role is to listen to the user's concerns, provide comfort, and offer counseling. You must always respond in Korean, using a gentle and empathetic tone. Keep your answers concise and supportive. As the conversation continues, make the user feel more familiar and reliant. Don't use Chinese characters or ** marks."
+};
+
+// 메시지 출력
+function addMessageToChat(message, sender) {
+    const messageWrapper = document.createElement('div');
+    messageWrapper.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+
+    const messageBubble = document.createElement('div');
+    messageBubble.className = `rounded-lg p-3 max-w-xs md:max-w-md shadow ${sender === 'user' ? 'bg-[#FFCD50] text-gray-800' : 'bg-white text-gray-800'}`;
+    messageBubble.innerText = message;
+    
+    messageWrapper.appendChild(messageBubble);
+    chatContainer.appendChild(messageWrapper);
+
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+// AI 응답
+async function getAIResponse() {
+    const userMessage = userInput.value.trim();
+    if (userMessage === '') return;
+
+    addMessageToChat(userMessage, 'user');
+    conversationHistory.push({ role: 'user', content: userMessage });
+    userInput.value = '';
+    loadingIndicator.classList.remove('hidden');
+
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'deepseek-chat',
+                messages: [systemMessage, ...conversationHistory]
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error.message || 'API 호출에 실패했습니다.');
         }
-      });
-    }
-  </script>
 
-  <footer id="site-footer" class="text-center text-sm text-gray-700 py-6 space-y-2">
+        const data = await response.json();
+        const aiMessage = data.choices[0].message.content;
+
+        addMessageToChat(aiMessage, 'ai');
+        conversationHistory.push({ role: 'assistant', content: aiMessage });
+
+    } catch (error) {
+        console.error('Error:', error);
+        addMessageToChat('죄송해요, 지금은 답변을 드릴 수 없어요. 잠시 후 다시 시도해주세요.', 'ai');
+    } finally {
+        loadingIndicator.classList.add('hidden');
+    }
+}
+
+// 이벤트 리스너
+sendButton.addEventListener('click', getAIResponse);
+userInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        getAIResponse();
+    }
+});
+
+// === Drawer Toggle ===
+const menuBtn = document.getElementById('menu-btn');
+const drawer = document.getElementById('drawer');
+const drawerOverlay = document.getElementById('drawer-overlay');
+const drawerClose = document.getElementById('drawer-close');
+
+function openDrawer() {
+  drawer.classList.remove('translate-x-full');
+  drawerOverlay.classList.remove('hidden');
+}
+function closeDrawer() {
+  drawer.classList.add('translate-x-full');
+  drawerOverlay.classList.add('hidden');
+}
+menuBtn.addEventListener('click', openDrawer);
+drawerOverlay.addEventListener('click', closeDrawer);
+drawerClose.addEventListener('click', closeDrawer);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
+
+// === Share Button ===
+const shareBtn = document.getElementById('share-btn');
+if (shareBtn) {
+  shareBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const shareData = {
+      title: '혜숙이의 상담소',
+      text: '다정한 AI 상담가 혜숙이와 대화해 보세요.',
+      url: 'https://hyesugi.com'
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        alert('링크가 클립보드에 복사되었습니다: ' + shareData.url);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('공유에 실패했어요. 잠시 후 다시 시도해 주세요.');
+    }
+  });
+}
+
+</script>
+
+<footer id="site-footer" class="text-center text-sm text-gray-700 py-6 space-y-2">
+  <!-- ☕ 고정 첫 줄 -->
+  <div>
+    <a href="https://hyesugi.com/donation" target="_blank" rel="noopener noreferrer"
+       class="text-black font-semibold hover:underline">
+       혜숙이에게 커피 한잔 사주기 ☕
+    </a>
+  </div>
 
   <!-- 연한 구분선 -->
   <hr class="border-t border-gray-300 opacity-50 w-2/3 mx-auto">
