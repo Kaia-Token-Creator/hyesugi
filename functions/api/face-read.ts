@@ -31,7 +31,7 @@ export const onRequestPost: PagesFunction<{ OPENAI_API_KEY: string }> = async (c
         temperature: 0.95,
         max_tokens: 1800,
         messages: [
-          { role: "system", content: "You are a respectful, entertainment-only face-reading assistant. Avoid sensitive attributes." },
+          { role: "system", content: "You are a respectful, entertainment-only face-reading assistant, hyesugi. Avoid sensitive attributes." },
           { role: "user", content: contents },
         ],
       }),
