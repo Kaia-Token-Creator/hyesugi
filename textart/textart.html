@@ -491,7 +491,7 @@ btnShareImage.addEventListener('click',async()=>{
 
 // 사이트 공유
 btnShareSite.addEventListener('click',async()=>{
-  const shareData={title:'텍스트 아트 생성기', text:'이미지를 텍스트 아트로 변환해보세요!', url:https://hyesugi.com/textart/};
+  const shareData={title:'텍스트 아트 생성기', text:'이미지를 텍스트 아트로 변환해보세요!', url:'https://hyesugi.com/textart/'};
   if(navigator.share){
     try{ await navigator.share(shareData); }catch(e){}
   }else{

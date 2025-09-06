@@ -73,14 +73,17 @@
     <!-- 본문: 파란 창 대신 iframe 삽입 -->
     <main id="content" class="flex-1 p-4">
       <div class="rounded-xl overflow-hidden border border-gray-200 shadow bg-white">
+
         <iframe
-          src="https://hyesugi.com/textart/textart.html"
-          title="텍스트 아트 생성기"
-          class="w-full"
-          style="height: calc(100svh - 200px);"
-          loading="lazy"
-          referrerpolicy="no-referrer">
-        </iframe>
+  src="https://hyesugi.com/textart/textart.html"
+  title="텍스트 아트 생성기"
+  class="w-full"
+  style="height: calc(100svh - 200px); border:0;"
+  loading="lazy"
+  referrerpolicy="no-referrer"
+  allow="clipboard-read; clipboard-write"
+></iframe>
+
       </div>
     </main>
   </div>
