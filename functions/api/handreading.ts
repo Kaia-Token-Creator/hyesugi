@@ -1,7 +1,27 @@
 // /functions/api/handreading.ts
-// Cloudflare Pages Functions - POST /functions/api/handreading
-// - FormData로 image 파일을 받아 OpenAI 비전 모델로 손금 리포트를 생성합니다.
-// - OPENAI_API_KEY 는 Cloudflare 프로젝트의 Secret으로 바인딩되어 있다고 가정합니다.
+// ✅ Cloudflare Pages Functions - POST /api/handreading
+// - FormData로 image 파일을 받아 OpenAI 비전 모델로 손금 리포트를 생성
+// - OPENAI_API_KEY 는 Cloudflare Pages 프로젝트의 Secret으로 바인딩되어 있어야 합니다.
+
+export const onRequestGet: PagesFunction = async () => {
+  // (선택) 라우팅 헬스체크용. 브라우저에서 /api/handreading GET 해보면 동작여부 확인 가능
+  return new Response(JSON.stringify({ ok: true, ping: "handreading alive" }), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
+};
+
+function arrayBufferToBase64(buf: ArrayBuffer): string {
+  // 큰 파일에서도 안전한 chunk 인코딩
+  let binary = "";
+  const bytes = new Uint8Array(buf);
+  const chunkSize = 0x8000; // 32KB
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  // @ts-ignore - btoa는 Workers 런타임에서 제공
+  return btoa(binary);
+}
 
 export const onRequestPost: PagesFunction<{ OPENAI_API_KEY: string }> = async (ctx) => {
   try {
@@ -22,9 +42,9 @@ export const onRequestPost: PagesFunction<{ OPENAI_API_KEY: string }> = async (c
       });
     }
 
-    // 파일을 base64 data URL 로 변환
+    // 파일을 base64 data URL 로 변환 (chunk 방식)
     const buf = await img.arrayBuffer();
-    const b64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
+    const b64 = arrayBufferToBase64(buf);
     const dataUrl = `data:${img.type || "image/jpeg"};base64,${b64}`;
 
     // 프롬프트(한국어): 점술/의료 효력 오해 방지 안내 포함
@@ -45,7 +65,7 @@ export const onRequestPost: PagesFunction<{ OPENAI_API_KEY: string }> = async (c
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini", // 가볍고 비전 지원
+        model: "gpt-4o-mini", // 비전 지원 경량 모델
         temperature: 0.7,
         messages: [
           { role: "system", content: systemPrompt },
