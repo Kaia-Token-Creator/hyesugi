@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QR5TWB3RYJ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QR5TWB3RYJ');
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9891583086388017"
+     crossorigin="anonymous"></script>
+
+  <!-- 기본 설정 -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>손금 - 혜숙이, 마음의 쉼터</title>
+  <meta name="description" content="손금 전문가 ‘혜숙이’가 당신의 손금을 봐 드립니다." />
+  <link rel="canonical" href="https://hyesugi.com/" />
+  <meta name="robots" content="index,follow" />
+  <meta name="theme-color" content="#9bbbd4" />
+
+  <!-- Favicon & App Icons -->
+  <link rel="icon" href="https://hyesugi.com/favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="https://hyesugi.com/apple-touch-icon.png" sizes="180x180" />
+  <link rel="manifest" href="https://hyesugi.com/site.webmanifest" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="hyesugi.com" />
+  <meta property="og:url" content="https://hyesugi.com/" />
+  <meta property="og:title" content="혜숙이의 상담소" />
+  <meta property="og:description" content="‘혜숙이’가 다정하게 고민을 들어드립니다" />
+  <meta property="og:image" content="https://hyesugi.com/handreading/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="혜숙이 상담 화면 미리보기" />
+
+  <!-- Twitter (X) Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="손금 - 혜숙이의 상담소" />
+  <meta name="twitter:description" content="‘혜숙이’가 손금을 봐 드려요" />
+  <meta name="twitter:image" content="https://hyesugi.com/handreading/og-image.jpg" />
+
+  <link rel="preload" as="image" href="https://hyesugi.com/preview.jpg" imagesrcset="https://hyesugi.com/handreading/og-image.jpg" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white font-sans">
+  <div id="app" class="flex flex-col min-h-screen max-w-3xl mx-auto bg-[#9bbbd4]">
+
+    <!-- Header + 햄버거 메뉴 버튼 -->
+    <header class="bg-white/30 backdrop-blur-sm text-center py-4 shadow-md relative">
+      <h1 class="text-xl font-bold text-gray-800 flex items-center justify-center gap-2">
+        <a href="https://hyesugi.com" class="flex items-center justify-center gap-2" aria-label="hyesugi.com으로 이동">
+          <img src="https://hyesugi.com/hyesugi.jpg" alt="혜숙이" class="w-14 h-14 rounded-full object-cover">
+          당신의 상담친구 혜숙이
+        </a>
+      </h1>
+      <p class="text-sm text-gray-600">우측 메뉴를 눌러보세요</p>
+
+      <!-- 햄버거 버튼 -->
+      <button id="menu-btn" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-white/60 focus:outline-none focus:ring-2 focus:ring-black/40" aria-label="메뉴 열기">
+        <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- 공통 본문 컨테이너: 각 페이지는 여기만 수정 -->
+    <main id="content" class="flex-1 p-4">
+      <!-- === Hand Reading Page === -->
+      <section class="bg-white/80 rounded-2xl shadow p-4 sm:p-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-2">손금 보기 (AI)</h2>
+        <p class="text-sm text-gray-700 mb-4">
+          <strong>안내:</strong> <span class="underline">손바닥 전체가 선명하게 나온 사진을 올려주세요</span> (한 손, 고해상도 권장). 조명은 밝고 균일하게!
+        </p>
+
+        <!-- 업로드 박스 -->
+        <div id="dropzone"
+             class="border-2 border-dashed border-gray-400 rounded-xl bg-white/70 p-4 sm:p-6 text-center cursor-pointer hover:bg-white transition">
+          <input id="file-input" type="file" accept="image/*" class="hidden" />
+          <div class="flex flex-col items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+            </svg>
+            <div class="text-gray-800 font-medium">이미지 선택 또는 드래그 앤 드롭</div>
+            <div class="text-gray-600 text-sm">JPG/PNG 등 이미지 파일</div>
+            <button id="choose-btn" class="px-4 py-2 rounded-full bg-black text-white text-sm">파일 선택</button>
+          </div>
+          <img id="preview" class="mt-4 mx-auto max-h-64 rounded-lg hidden" alt="미리보기">
+        </div>
+
+        <!-- 동작 버튼 -->
+        <div class="mt-4 flex flex-wrap items-center gap-2">
+          <button id="analyze-btn" class="px-4 py-2 rounded-full bg-black text-white disabled:opacity-50">분석 시작</button>
+          <button id="copy-result-btn" class="px-4 py-2 rounded-full border border-gray-700 text-gray-800 bg-white">결과 복사</button>
+          <button id="share-result-btn" class="px-4 py-2 rounded-full border border-gray-700 text-gray-800 bg-white">결과 공유</button>
+          <button id="share-page-btn" class="px-4 py-2 rounded-full border border-gray-700 text-gray-800 bg-white">사이트 공유</button>
+        </div>
+
+        <!-- 진행 상태 -->
+        <div id="status" class="mt-3 text-sm text-gray-700"></div>
+
+        <!-- 결과 -->
+        <div class="mt-4">
+          <label for="result" class="block text-sm font-semibold text-gray-800 mb-1">손금 리포트</label>
+          <textarea id="result" class="w-full h-56 p-3 rounded-xl border border-gray-300 focus:outline-none" placeholder="여기에 결과가 표시됩니다." readonly></textarea>
+          <p class="mt-2 text-xs text-gray-600">※ 본 서비스는 엔터테인먼트 목적이며, 의료·법률적 조언이 아닙니다.</p>
+        </div>
+      </section>
+      <!-- === /Hand Reading Page === -->
+    </main>
+  </div>
+
+  <!-- Overlay & Drawer -->
+  <div id="drawer-overlay" class="fixed inset-0 bg-black/30 hidden z-40"></div>
+  <aside id="drawer" class="fixed right-0 top-0 h-full w-1/2 max-w-md bg-white shadow-xl translate-x-full transition-transform duration-300 z-50">
+    <div class="flex items-center justify-between p-4 border-b">
+      <h2 class="font-bold text-gray-800">메뉴</h2>
+      <button id="drawer-close" class="p-2 rounded-md hover:bg-gray-100" aria-label="메뉴 닫기">
+        <svg class="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <nav class="p-4 space-y-2">
+      <a href="https://hyesugi.com" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">HOME</a>
+      <a href="https://hyesugi.com/handreading" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">손금 보기</a>
+      <a href="https://hyesugi.com/luck" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">위로와 행운</a>
+      <a href="https://hyesugi.com/fate" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">사주와 궁합</a>
+      <a href="https://hyesugi.com/facereading" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">나의 관상은</a>
+      <a href="https://hyesugi.com/handreading" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">나의 손금은</a>
+      <a href="https://hyesugi.com/board" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">익명 게시판</a>
+      <a href="https://hyesugi.com/expert" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">전문가 상담</a>
+      <a href="https://hyesugi.com/solo" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">솔로는 여기</a>
+      <a href="https://hyesugi.com/money" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">돈되는 정보</a>
+      <a href="https://hyesugi.com/game" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">신나는 게임</a>
+      <a href="https://hyesugi.com/info" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">이용 안내</a>
+      <a href="#" id="share-btn" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">공유하기</a>
+    </nav>
+  </aside>
+
+  <!-- 공통 스크립트: 드로어 + 공유 + 손금업로드 -->
+  <script>
+    // === Drawer Toggle ===
+    const menuBtn = document.getElementById('menu-btn');
+    const drawer = document.getElementById('drawer');
+    const drawerOverlay = document.getElementById('drawer-overlay');
+    const drawerClose = document.getElementById('drawer-close');
+
+    function openDrawer() {
+      drawer.classList.remove('translate-x-full');
+      drawerOverlay.classList.remove('hidden');
+    }
+    function closeDrawer() {
+      drawer.classList.add('translate-x-full');
+      drawerOverlay.classList.add('hidden');
+    }
+
+    menuBtn.addEventListener('click', openDrawer);
+    drawerOverlay.addEventListener('click', closeDrawer);
+    drawerClose.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
+
+    // === Global Share (Drawer) ===
+    const shareBtnGlobal = document.getElementById('share-btn');
+    if (shareBtnGlobal) {
+      shareBtnGlobal.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const shareData = {
+          title: '혜숙이의 상담소',
+          text: '다정한 AI 상담가 혜숙이와 대화해 보세요.',
+          url: 'https://hyesugi.com'
+        };
+        try {
+          if (navigator.share) {
+            await navigator.share(shareData);
+          } else {
+            await navigator.clipboard.writeText(shareData.url);
+            alert('링크가 클립보드에 복사되었습니다: ' + shareData.url);
+          }
+        } catch (err) {
+          console.error(err);
+          alert('공유에 실패했어요. 잠시 후 다시 시도해 주세요.');
+        }
+      });
+    }
+
+    // === Handreading Page Logic ===
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('file-input');
+    const chooseBtn = document.getElementById('choose-btn');
+    const preview = document.getElementById('preview');
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const statusEl = document.getElementById('status');
+    const resultEl = document.getElementById('result');
+    const copyBtn = document.getElementById('copy-result-btn');
+    const shareResultBtn = document.getElementById('share-result-btn');
+    const sharePageBtn = document.getElementById('share-page-btn');
+
+    const WATERMARK = "https://hyesugi.com/handreading";
+
+    function setStatus(msg) { statusEl.textContent = msg || ""; }
+
+    function setPreview(file) {
+      if (!file) {
+        preview.classList.add('hidden');
+        preview.src = "";
+        return;
+      }
+      const url = URL.createObjectURL(file);
+      preview.src = url;
+      preview.onload = () => URL.revokeObjectURL(url);
+      preview.classList.remove('hidden');
+    }
+
+    function pickFile() { fileInput.click(); }
+
+    // Drag & Drop
+    dropzone.addEventListener('click', pickFile);
+    chooseBtn.addEventListener('click', (e) => { e.stopPropagation(); pickFile(); });
+    fileInput.addEventListener('change', () => {
+      const f = fileInput.files?.[0];
+      setPreview(f);
+    });
+
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('bg-white'); });
+    dropzone.addEventListener('dragleave', () => { dropzone.classList.remove('bg-white'); });
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('bg-white');
+      const f = e.dataTransfer?.files?.[0];
+      if (f) {
+        fileInput.files = e.dataTransfer.files;
+        setPreview(f);
+      }
+    });
+
+    // Analyze
+    analyzeBtn.addEventListener('click', async () => {
+      const file = fileInput.files?.[0];
+      if (!file) {
+        alert("이미지를 먼저 선택해 주세요.");
+        return;
+      }
+      analyzeBtn.disabled = true;
+      setStatus("분석 중입니다… (최대 수십 초)");
+
+      try {
+        const fd = new FormData();
+        fd.append("image", file);
+        const resp = await fetch("/functions/api/handreading", {
+          method: "POST",
+          body: fd
+        });
+
+        if (!resp.ok) {
+          const errText = await resp.text().catch(() => "");
+          throw new Error("서버 오류: " + errText);
+        }
+        const data = await resp.json();
+        if (!data.ok) throw new Error(data.error || "분석 실패");
+
+        resultEl.value = (data.text || "").trim();
+        setStatus("완료!");
+      } catch (err) {
+        console.error(err);
+        alert("분석에 실패했어요. 사진이 흐리지 않은지 확인하고 다시 시도해 주세요.");
+        setStatus("오류가 발생했습니다.");
+      } finally {
+        analyzeBtn.disabled = false;
+      }
+    });
+
+    // Copy result (+ watermark)
+    copyBtn.addEventListener('click', async () => {
+      const txt = resultEl.value?.trim();
+      if (!txt) return alert("복사할 결과가 없습니다.");
+      const payload = `${txt}\n\n— via ${WATERMARK}`;
+      try {
+        await navigator.clipboard.writeText(payload);
+        alert("결과가 복사되었습니다. (워터마크 포함)");
+      } catch {
+        alert("복사에 실패했어요.");
+      }
+    });
+
+    // Share result (+ watermark)
+    shareResultBtn.addEventListener('click', async () => {
+      const txt = resultEl.value?.trim();
+      if (!txt) return alert("공유할 결과가 없습니다.");
+      const payload = `${txt}\n\n— via ${WATERMARK}`;
+      const shareData = { title: "손금 리포트", text: payload };
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+        } else {
+          await navigator.clipboard.writeText(payload);
+          alert("공유가 지원되지 않아, 결과를 클립보드에 복사했습니다.");
+        }
+      } catch (e) {
+        console.error(e);
+        alert("공유에 실패했어요.");
+      }
+    });
+
+    // Share site (this page)
+    sharePageBtn.addEventListener('click', async () => {
+      const url = "https://hyesugi.com/handreading";
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: "손금 보기 (AI)", text: "AI로 손금 리포트를 받아보세요.", url });
+        } else {
+          await navigator.clipboard.writeText(url);
+          alert("페이지 링크를 복사했습니다: " + url);
+        }
+      } catch (e) {
+        console.error(e);
+        alert("공유에 실패했어요.");
+      }
+    });
+  </script>
+
+<footer id="site-footer" class="text-center text-sm text-gray-700 py-6 space-y-2">
+  <!-- ☕ 고정 첫 줄 -->
+  <div>
+    <a href="https://hyesugi.com/donation" target="_blank" rel="noopener noreferrer"
+       class="text-black font-semibold hover:u
