@@ -303,11 +303,10 @@
 
         const fd = new FormData();
         fd.append("image", safeFile);
-        const resp = await fetch("/functions/api/handreading", {
-          method: "POST",
-          body: fd
-        });
-
+        const resp = await fetch("/api/handreading", {
+  method: "POST",
+  body: fd
+});
         if (!resp.ok) {
           const errText = await resp.text().catch(() => "");
           throw new Error("서버 오류: " + errText);
