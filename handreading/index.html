@@ -308,9 +308,11 @@
   body: fd
 });
         if (!resp.ok) {
-          const errText = await resp.text().catch(() => "");
-          throw new Error("서버 오류: " + errText);
-        }
+  const errText = await resp.text().catch(() => "");
+  console.error("handreading POST failed:", resp.status, errText);
+  throw new Error("서버 오류: " + resp.status);
+}
+
         const data = await resp.json();
         if (!data.ok) throw new Error(data.error || "분석 실패");
 
