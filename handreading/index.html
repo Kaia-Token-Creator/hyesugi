@@ -81,7 +81,8 @@
         <!-- 업로드 박스 -->
         <div id="dropzone"
              class="border-2 border-dashed border-gray-400 rounded-xl bg-white/70 p-4 sm:p-6 text-center cursor-pointer hover:bg-white transition">
-          <input id="file-input" type="file" accept="image/*" class="hidden" />
+          <!-- ⬇️ JPG/PNG로 제한 -->
+          <input id="file-input" type="file" accept="image/jpeg,image/png" class="hidden" />
           <div class="flex flex-col items-center gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -224,9 +225,12 @@
     dropzone.addEventListener('click', pickFile);
     chooseBtn.addEventListener('click', (e) => { e.stopPropagation(); pickFile(); });
     fileInput.addEventListener('change', () => {
-      const f = fileInput.files?.[0];
-      setPreview(f);
-    });
+  const f = fileInput.files?.[0];
+  if (f && (f.type === 'image/heic' || f.type === 'image/heif' || /\.heic$/i.test(f.name))) {
+    alert("아이폰 HEIC 형식은 브라우저에서 바로 변환이 어려워요.\n설정>카메라>포맷을 '가장 호환성'으로 바꾸거나, 사진을 JPEG로 변환해 업로드해 주세요.");
+  }
+  setPreview(f);
+});
 
     dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('bg-white'); });
     dropzone.addEventListener('dragleave', () => { dropzone.classList.remove('bg-white'); });
@@ -240,6 +244,49 @@
       }
     });
 
+    // ⬇️ JPG/PNG만 허용 + 1600px 리사이즈 & JPEG 재인코딩
+    async function prepareImage(originalFile) {
+      const okTypes = ["image/jpeg", "image/png"];
+      if (!okTypes.includes(originalFile.type)) {
+        throw new Error("JPG 또는 PNG 파일로 업로드해 주세요. (iPhone은 설정 > 카메라 > 포맷에서 ‘가장 호환성’ 권장)");
+      }
+
+      // 이미 JPEG이고 2MB 이하/짧은 변 1600px 이하라면 그대로 사용
+      const sizeOk = originalFile.size <= 2 * 1024 * 1024;
+      // 미리보기용으로 이미지 크기 읽기
+      const img = new Image();
+      const url = URL.createObjectURL(originalFile);
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+      const w0 = img.naturalWidth, h0 = img.naturalHeight;
+      const maxSide = 1600;
+      const needsResize = Math.max(w0, h0) > maxSide;
+
+      if (originalFile.type === "image/jpeg" && sizeOk && !needsResize) {
+        URL.revokeObjectURL(url);
+        return originalFile;
+      }
+
+      // 캔버스로 리사이즈 후 JPEG 0.85
+      let w = w0, h = h0;
+      if (needsResize) {
+        const scale = maxSide / Math.max(w0, h0);
+        w = Math.round(w0 * scale);
+        h = Math.round(h0 * scale);
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      // 고품질 스무딩
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.85));
+      if (!blob) throw new Error("이미지 변환에 실패했어요. 다른 사진으로 시도해 주세요.");
+      return new File([blob], "hand.jpg", { type: "image/jpeg" });
+    }
+
     // Analyze
     analyzeBtn.addEventListener('click', async () => {
       const file = fileInput.files?.[0];
@@ -251,8 +298,11 @@
       setStatus("분석 중입니다… (최대 수십 초)");
 
       try {
+        // ⬇️ 업로드 전에 안정화 처리
+        const safeFile = await prepareImage(file);
+
         const fd = new FormData();
-        fd.append("image", file);
+        fd.append("image", safeFile);
         const resp = await fetch("/functions/api/handreading", {
           method: "POST",
           body: fd
@@ -269,7 +319,7 @@
         setStatus("완료!");
       } catch (err) {
         console.error(err);
-        alert("분석에 실패했어요. 사진이 흐리지 않은지 확인하고 다시 시도해 주세요.");
+        alert("분석에 실패했어요. JPG/PNG로 다시 올려 보시고, 손 전체가 나오게 밝은 곳에서 촬영해 주세요.");
         setStatus("오류가 발생했습니다.");
       } finally {
         analyzeBtn.disabled = false;
