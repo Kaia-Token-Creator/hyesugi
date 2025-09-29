@@ -13,7 +13,7 @@
 <!-- AdSense (Auto Ads) -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js?client=ca-pub-9891583086388017" crossorigin="anonymous"></script>
 <script>
-  // 상/하단 앵커 노출을 명시적으로 허용
+  // 앵커 광고 허용
   window.adsbygoogle = window.adsbygoogle || [];
   window.adsbygoogle.push({ overlays: { top: true, bottom: true } });
 </script>
@@ -303,14 +303,31 @@ if (shareBtn) {
   });
 }
 
-/* -------------------- AdSense 상단 공백 방지 (보수적 가드) -------------------- */
-// 일부 환경에서 Auto Ads가 body에 marginTop/paddingTop을 강제로 주는 케이스 방지
-const bodyStyleGuard = new MutationObserver(() => {
-  const st = document.body.style;
-  if (st.marginTop && st.marginTop !== '0px') st.marginTop = '0px';
-  if (st.paddingTop && st.paddingTop !== '0px') st.paddingTop = '0px';
-});
-bodyStyleGuard.observe(document.body, { attributes: true, attributeFilter: ['style'] });
+<script>
+  /* -------------------- AdSense 상단 공백 방지 (보수적 가드) -------------------- */
+  // 기존: 즉시 marginTop/paddingTop을 0으로 되돌림 → 간혹 앵커 로딩 자체가 막힘
+  // ↓↓↓ 교체: 앵커가 뜰 시간을 준 다음(2.5초 후) 레이아웃을 다시 0으로 맞춰 "겹치게" 만든다.
+
+  function applyNoTopGap() {
+    const st = document.body.style;
+    if (st.marginTop && st.marginTop !== '0px') st.marginTop = '0px';
+    if (st.paddingTop && st.paddingTop !== '0px') st.paddingTop = '0px';
+  }
+
+  // 1) 초기에는 간섭하지 않음 (앵커가 스스로 뜰 기회를 줌)
+  // 2) 조금 있다가 한 번 정리
+  setTimeout(applyNoTopGap, 2500);
+
+  // 3) 그 이후에 스타일이 다시 바뀌더라도(앵커가 재조정할 때) 부드럽게 되돌림
+  const bodyStyleGuard = new MutationObserver(() => {
+    // 너무 자주 덮어쓰지 않도록 rAF로 한 프레임에 합쳐서 처리
+    requestAnimationFrame(applyNoTopGap);
+  });
+  // 약간 더 늦게 옵저버 연결 (초기화 간섭 방지)
+  setTimeout(() => {
+    bodyStyleGuard.observe(document.body, { attributes: true, attributeFilter: ['style'] });
+  }, 3000);
+</script>
 
 /* -------------------- 모바일 키보드 대응: 입력창 항상 보이기 -------------------- */
 // 1) 시각적 뷰포트 변화를 감지하여 하단 패딩을 줘서 입력창 가림 방지
@@ -381,6 +398,7 @@ applyViewportPadding();
 
 </body>
 </html>
+
 
 
 
