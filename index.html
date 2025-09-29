@@ -55,18 +55,15 @@
     #chat-container::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
     #chat-container::-webkit-scrollbar-thumb:hover { background: #555; }
 
-:root { --anchorH: 72px; } /* 앵커 광고 대략 높이(필요시 숫자만 조절) */
+:root { --anchorH: 75px; --kb: 0px; } /* ← --kb: 키보드 높이(기본 0) */
 
 #app{
-  /* 앵커광고 + 안전영역 만큼 하단 여백 확보 */
-  padding-bottom: calc(var(--anchorH) + env(safe-area-inset-bottom));
+  padding-bottom: calc(var(--anchorH) + env(safe-area-inset-bottom) + var(--kb)); /* ← 추가 */
 }
-
-/* 채팅 입력창을 항상 보이게 하단에 '붙이되' 앵커광고만큼 띄움 */
 #chat-footer{
   position: sticky;
-  bottom: calc(var(--anchorH) + env(safe-area-inset-bottom));
-  z-index: 30; /* 앵커광고 아래로 깔리지 않게 */
+  bottom: calc(var(--anchorH) + env(safe-area-inset-bottom) + var(--kb)); /* ← 추가 */
+  z-index: 30;
 }
 
 </style>
@@ -322,6 +319,49 @@ if (shareBtn) {
     slot.replaceChildren(a);
   }
 </script>
+<script>
+/**
+ * 모바일 키보드가 올라올 때 #chat-footer가 가려지지 않도록
+ * window.visualViewport를 이용해 키보드 높이를 계산하여 CSS 변수(--kb)를 갱신한다.
+ */
+(function keyboardGuard() {
+  const rootStyle = document.documentElement.style;
+  const vv = window.visualViewport;
 
+  function setKB(px) {
+    const v = Math.max(0, Math.round(px || 0));
+    rootStyle.setProperty('--kb', v + 'px');
+  }
+
+  function updateKB() {
+    if (vv) {
+      const overlap = (window.innerHeight - vv.height - vv.offsetTop);
+      setKB(overlap);
+    } else {
+      setKB(0);
+    }
+  }
+
+  if (vv) {
+    vv.addEventListener('resize', updateKB);
+    vv.addEventListener('scroll', updateKB);
+  }
+  window.addEventListener('orientationchange', () => setTimeout(updateKB, 250));
+  window.addEventListener('resize', updateKB);
+
+  updateKB();
+
+  const input = document.getElementById('user-input');
+  if (input) {
+    input.addEventListener('focus', () => {
+      setTimeout(() => {
+        try {
+          input.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+        } catch (_) {}
+      }, 150);
+    });
+  }
+})();
+</script>
 </body>
 </html>
