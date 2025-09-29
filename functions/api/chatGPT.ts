@@ -1,10 +1,8 @@
-// /functions/api/chatGPT.ts  — Cloudflare Pages Functions
-// Secrets: OPEN_API_KEY (Pages → Settings → Variables → Secrets)
-// 주의: 파일명 대소문자 = 경로 대소문자 → 이 파일이면 URL은 /api/chatGPT
+// /functions/api/chatGPT.ts — Cloudflare Pages Functions
+// Secrets: OPEN_API_KEY (권장) 또는 OPENAI_API_KEY (호환)
+// NOTE: 배포 후 /api/chatGPT?diag=1, /api/chatGPT?probe=1 로 서버 자체 진단 가능
 
-type Env = {
-  OPEN_API_KEY: string;
-};
+type Env = { OPEN_API_KEY?: string; OPENAI_API_KEY?: string };
 
 const JSON_HEADERS = { "content-type": "application/json" };
 const CORS_HEADERS = {
@@ -13,68 +11,92 @@ const CORS_HEADERS = {
   "access-control-allow-methods": "POST, OPTIONS, GET",
 };
 
-function jres(obj: any, status = 200) {
-  return new Response(JSON.stringify(obj), { status, headers: { ...JSON_HEADERS, ...CORS_HEADERS } });
-}
+const jres = (obj: unknown, status = 200) =>
+  new Response(JSON.stringify(obj), { status, headers: { ...JSON_HEADERS, ...CORS_HEADERS } });
+
+const getApiKey = (env: Env) => (env.OPEN_API_KEY || env.OPENAI_API_KEY || "").toString().trim();
 
 export const onRequestOptions: PagesFunction<Env> = async () =>
   new Response(null, { headers: { ...CORS_HEADERS, "content-length": "0" } });
 
-/** 헬스체크: /api/chatGPT GET → {ok:true} */
-export const onRequestGet: PagesFunction<Env> = async () => jres({ ok: true });
+/** GET: 헬스체크 & 진단
+ *  - /api/chatGPT                → { ok: true }
+ *  - /api/chatGPT?diag=1         → { hasKey: boolean, keyLen: number }
+ *  - /api/chatGPT?probe=1        → OpenAI에 "ping" 호출 결과(성공/에러 원문 표시)
+ */
+export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
+  const url = new URL(request.url);
+  if (url.searchParams.has("diag")) {
+    const key = getApiKey(env);
+    return jres({ hasKey: !!key, keyLen: key ? key.length : 0 });
+  }
+  if (url.searchParams.has("probe")) {
+    const apiKey = getApiKey(env);
+    if (!apiKey) return jres({ error: { message: "Missing OPEN_API_KEY/OPENAI_API_KEY" } }, 500);
+    try {
+      const r = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: "Respond in Korean, one short word only." },
+            { role: "user", content: "ping" },
+          ],
+          max_tokens: 8,
+        }),
+      });
+      const text = await r.text();
+      if (!r.ok) return jres({ probe: "openai_error", status: r.status, body: text }, r.status);
+      return jres({ probe: "ok", body: JSON.parse(text) });
+    } catch (e: any) {
+      return jres({ probe: "fetch_fail", message: e?.message || "unknown" }, 500);
+    }
+  }
+  return jres({ ok: true });
+};
 
 export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   try {
     const { env, request } = ctx;
-    const apiKey = env.OPEN_API_KEY;
+    const apiKey = getApiKey(env);
     if (!apiKey) return jres({ error: { message: "Missing OPEN_API_KEY in environment." } }, 500);
 
-    // 프런트에서 보낸 페이로드
-    const body = await request.json().catch(() => ({} as any));
-    // 프런트 기본 형태와 호환: { model, messages, system, temperature, max_tokens }
+    const body = await request.json<any>().catch(() => ({}));
     const {
       messages = [],
       system = "You are '혜숙이', a professional counselor and warm-hearted friend. Always respond in Korean with a gentle, empathetic tone. Keep answers concise and supportive. Avoid Chinese characters and asterisks.",
-      model = "gpt-4o-mini", // 안전 기본값
+      model = "gpt-4o-mini",
       temperature = 0.6,
       max_tokens = 512,
     } = body || {};
 
-    // 방어: messages가 비어있으면 system+placeholder라도 보냄
     const finalMessages =
-      (Array.isArray(messages) && messages.length > 0)
+      Array.isArray(messages) && messages.length > 0
         ? [{ role: "system", content: system }, ...messages]
-        : [
-            { role: "system", content: system },
-            { role: "user", content: "간단히 인사해 줘." },
-          ];
+        : [{ role: "system", content: system }, { role: "user", content: "간단히 인사해 줘." }];
 
-    const payload = {
-      model,
-      messages: finalMessages,
-      temperature,
-      max_tokens,
-    };
+    const payload = { model, messages: finalMessages, temperature, max_tokens };
 
     const r = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        "authorization": `Bearer ${apiKey}`,
+        authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify(payload),
     });
 
-    const text = await r.text(); // 항상 텍스트로 받아 에러/성공 모두 표준화
-    // 디버그: OpenAI에서 에러가 오면 그대로 넘겨서 프런트에서 메시지 보이게
+    const text = await r.text();
     if (!r.ok) return jres({ error: { message: `OpenAI error: ${text}` } }, r.status);
 
-    // 성공 시 OpenAI 원본 그대로 반환(프런트가 data.choices[0].message.content 사용)
     try {
       const data = JSON.parse(text);
       return jres(data, 200);
     } catch {
-      // 혹시 JSON 파싱 실패 시 원문 전달
       return jres({ error: { message: `Malformed JSON from OpenAI: ${text}` } }, 502);
     }
   } catch (e: any) {
