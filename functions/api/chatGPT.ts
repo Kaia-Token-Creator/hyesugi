@@ -91,7 +91,7 @@ function dynamicMaxTokens(userText: string) {
   const inTokens = estimateTokensFromText(userText);
   const desired = Math.round(inTokens * 1.8); // 입력 대비 1.8배 여유
   const MIN = 180;  // 짧은 질문에도 최소 이 정도는 허용
-  const MAX = 700;  // 너무 장황해지는 것 방지
+  const MAX = 1500;  // 너무 장황해지는 것 방지
   return Math.max(MIN, Math.min(MAX, desired));
 }
 
@@ -176,3 +176,4 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     return jres({ error: { message: e?.message || "Unknown server error" } }, 500);
   }
 };
+
