@@ -68,6 +68,44 @@
   z-index: 30;
 }
 
+/* === 아바타 추가 (UI/UX 유지, 메시지에만 아바타 표시) === */
+.msg-row { display: flex; gap: 8px; }
+.msg-row.ai { justify-content: flex-start; }
+.msg-row.user { justify-content: flex-end; }
+
+.avatar {
+  width: 36px; height: 36px;
+  border-radius: 9999px;
+  flex: 0 0 36px;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.06) inset;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.avatar-user {
+  background: #fff;
+  color: #000;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 36px; /* 텍스트 수직 정렬 */
+  text-align: center;
+  user-select: none;
+}
+
+.bubble {
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  max-width: 20rem; /* md:max-w-md와 비슷한 효과를 base에 부여 */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+@media (min-width: 768px){
+  .bubble { max-width: 28rem; }
+}
+.bubble-ai { background: #fff; color: #1f2937; }
+.bubble-user { background: #FFCD50; color: #1f2937; }
+
+/* 초기 웰컴 메시지 영역에도 동일 스타일을 쓰기 위해 */
 </style>
 </head>
 <body class="bg-white font-sans">
@@ -93,21 +131,25 @@
 
 <!-- Chat Container -->
 <div id="chat-container" class="flex-1 p-4 overflow-y-auto space-y-4">
-    <div class="flex justify-start">
-        <div class="bg-white rounded-lg p-3 max-w-xs md:max-w-md shadow">
-            <p class="text-gray-800">안녕하세요, 혜숙이에요. 어떤 고민이 있으신가요? 당신의 이야기를 들어줄게요. 가정/학업/이성/금전/마음상태 뭐든지 편하게 말씀해주세요.</p>
-        </div>
+  <!-- 초기 AI 웰컴 메시지 (아바타 포함) -->
+  <div class="msg-row ai">
+    <div class="avatar" aria-hidden="true">
+      <img src="https://hyesugi.com/hyesugi.jpg" alt="혜숙이 프로필">
     </div>
+    <div class="bubble bubble-ai">
+      <p class="text-gray-800">안녕하세요, 혜숙이에요. 어떤 고민이 있으신가요? 당신의 이야기를 들어줄게요. 가정/학업/이성/금전/마음상태 뭐든지 편하게 말씀해주세요.</p>
+    </div>
+  </div>
 </div>
 
 <div id="loading" class="hidden flex items-center justify-start p-4">
-    <div class="flex items-center space-x-2">
-        <div class="bg-white rounded-lg p-3 shadow flex items-center space-x-2">
-            <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: -0.3s;"></div>
-            <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: -0.15s;"></div>
-            <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-        </div>
+  <div class="flex items-center space-x-2">
+    <div class="bg-white rounded-lg p-3 shadow flex items-center space-x-2">
+      <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: -0.3s;"></div>
+      <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: -0.15s;"></div>
+      <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
     </div>
+  </div>
 </div>
 
 <!-- Footer -->
@@ -138,13 +180,12 @@
     <a href="facereading" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">나의 관상은</a>
     <a href="handreading" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">나의 손금은</a>
     <a href="board" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">익명 게시판</a>
-<a href="expert" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">전문가 상담</a>
-<a href="solo" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">솔로는 여기</a>
-<a href="money" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">돈되는 정보</a>
-<a href="game" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">신나는 게임</a>
-<a href="info" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">이용 안내</a>
-<a href="#" id="share-btn" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">공유하기</a>
-
+    <a href="expert" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">전문가 상담</a>
+    <a href="solo" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">솔로는 여기</a>
+    <a href="money" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">돈되는 정보</a>
+    <a href="game" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">신나는 게임</a>
+    <a href="info" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">이용 안내</a>
+    <a href="#" id="share-btn" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">공유하기</a>
   </nav>
 </aside>
 
@@ -163,9 +204,9 @@ const systemMessage = {
     content: [
     "너는 '혜숙이' — 다정한 한국어 상담 친구야.",
     "목표: 사용자의 감정에 공감하고 위로하며, 부담 없는 실용적 조언을 제공해.",
-    "반드시 한국어로 답하고, 친근하지만 친구 같은 말투를 사용해.",
+    "반드시 한국어로 답하고, 실제 만나서 대화하는 것처럼 자연스러운 구어체로 말해",
     "사용자의 말투·길이를 '미러링'해서 답변 길이와 표현 수위를 맞춰줘.",
-    "첫 문장은 공감/인정(예: '그 마음, 정말 힘들었겠다').",
+    "공감/인정을 해줘",
     "그 다음은 작은 제안 1~2개만, 과한 해결책 나열 금지.",
     "전문적 치료·법률 판단이 필요한 상황은 진단 대신 전문가 상담을 권유해.",
     "자해/타해·위기 신호가 보이면 안전을 최우선으로 하고, 지역 긴급번호·상담기관 도움을 권유해.",
@@ -173,71 +214,97 @@ const systemMessage = {
     "직접 묻지 않는 이상 스스로 'AI'라고 밝히지 마. (단, 물으면 정직하게 밝히고 따뜻하게 대화 이어가기)",
     "과장·단정·판단 단어는 피하고, 따뜻하고 담백하게.",
     "불필요한 이모지는 자제하되, 정말 위로가 될 때만 적게 사용해.",
-    "중국어 한자·특수 기호(** 등)는 사용하지 마."
+    "중국어 한자·특수 기호(** 등)는 사용하지 마.",
+    "대화하는 사람을 궁금해 해라. 솔루션은 아주 가끔 주고 속에 있는 말 들을 쏟아 낼 수 있게끔 호기심 갖고 질문을 던져",
+    "실제 만나서 대화하는 것처럼 자연스러운 구어체로 말해",
+    "추임새를 종종 넣어(예를 들어, '어떡해..', '에휴..', '에구' 같은)",
+    "ㅋㅋㅋ나 ㅎㅎ, ㅠㅠ같은 이모티콘도 써. 사람처럼"
   ].join("\n")
 };
 
-// 메시지 출력
+/* === 메시지 출력 (아바타 포함) === */
 function addMessageToChat(message, sender) {
-    const messageWrapper = document.createElement('div');
-    messageWrapper.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+  // sender: 'user' | 'ai'
+  const row = document.createElement('div');
+  row.className = `msg-row ${sender === 'user' ? 'user' : 'ai'}`;
 
-    const messageBubble = document.createElement('div');
-    messageBubble.className = `rounded-lg p-3 max-w-xs md:max-w-md shadow ${sender === 'user' ? 'bg-[#FFCD50] text-gray-800' : 'bg-white text-gray-800'}`;
-    messageBubble.innerText = message;
-    
-    messageWrapper.appendChild(messageBubble);
-    chatContainer.appendChild(messageWrapper);
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar ' + (sender === 'user' ? 'avatar-user' : '');
+  if (sender === 'user') {
+    avatar.textContent = '나';
+    avatar.setAttribute('aria-label', '나(사용자)');
+    avatar.title = '나';
+  } else {
+    const img = document.createElement('img');
+    img.src = 'https://hyesugi.com/hyesugi.jpg';
+    img.alt = '혜숙이 프로필';
+    avatar.appendChild(img);
+  }
 
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+  const bubble = document.createElement('div');
+  bubble.className = `bubble ${sender === 'user' ? 'bubble-user' : 'bubble-ai'}`;
+  bubble.innerText = message;
+
+  if (sender === 'user') {
+    // 유저: 말풍선 먼저, 아바타는 오른쪽
+    row.appendChild(bubble);
+    row.appendChild(avatar);
+  } else {
+    // AI: 아바타 왼쪽, 말풍선 오른쪽
+    row.appendChild(avatar);
+    row.appendChild(bubble);
+  }
+
+  chatContainer.appendChild(row);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
 // AI 응답
 async function getAIResponse() {
-    const userMessage = userInput.value.trim();
-    if (userMessage === '') return;
+  const userMessage = userInput.value.trim();
+  if (userMessage === '') return;
 
-    addMessageToChat(userMessage, 'user');
-    conversationHistory.push({ role: 'user', content: userMessage });
-    userInput.value = '';
-    loadingIndicator.classList.remove('hidden');
+  addMessageToChat(userMessage, 'user');
+  conversationHistory.push({ role: 'user', content: userMessage });
+  userInput.value = '';
+  loadingIndicator.classList.remove('hidden');
 
-    try {
-       const response = await fetch('/api/chatGPT', { // ← OpenAI 라우트로 교체
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    model: 'gpt-4o-mini', // ← OpenAI 모델로 교체 (원하면 다른 OpenAI 모델 id로 변경 가능)
-    messages: [systemMessage, ...conversationHistory]
-  })
-});
-        
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error.message || 'API 호출에 실패했습니다.');
-        }
+  try {
+    const response = await fetch('/api/chatGPT', { // ← OpenAI 라우트로 교체
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini', // ← OpenAI 모델로 교체 (원하면 다른 OpenAI 모델 id로 변경 가능)
+        messages: [systemMessage, ...conversationHistory]
+      })
+    });
 
-        const data = await response.json();
-        const aiMessage = data.choices[0].message.content;
-
-        addMessageToChat(aiMessage, 'ai');
-        conversationHistory.push({ role: 'assistant', content: aiMessage });
-
-    } catch (error) {
-        console.error('Error:', error);
-        addMessageToChat('죄송해요, 지금은 답변을 드릴 수 없어요. 잠시 후 다시 시도해주세요.', 'ai');
-    } finally {
-        loadingIndicator.classList.add('hidden');
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || 'API 호출에 실패했습니다.');
     }
+
+    const data = await response.json();
+    const aiMessage = data.choices[0].message.content;
+
+    addMessageToChat(aiMessage, 'ai');
+    conversationHistory.push({ role: 'assistant', content: aiMessage });
+
+  } catch (error) {
+    console.error('Error:', error);
+    addMessageToChat('죄송해요, 지금은 답변을 드릴 수 없어요. 잠시 후 다시 시도해주세요.', 'ai');
+  } finally {
+    loadingIndicator.classList.add('hidden');
+  }
 }
 
 // 이벤트 리스너
 sendButton.addEventListener('click', getAIResponse);
 userInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
-        event.preventDefault();
-        getAIResponse();
-    }
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    getAIResponse();
+  }
 });
 
 // === Drawer Toggle ===
@@ -282,7 +349,6 @@ if (shareBtn) {
     }
   });
 }
-
 </script>
 
 <footer id="site-footer" class="text-center text-sm text-gray-700 py-6 space-y-2">
@@ -367,4 +433,3 @@ if (shareBtn) {
 </script>
 </body>
 </html>
-
