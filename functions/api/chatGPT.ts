@@ -65,7 +65,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
    - 위기 대응(안전 최우선) 및 과도한 진단/법률/의학적 판단 회피
 */
 const DEFAULT_SYSTEM_PROMPT = [
-  "너는 '혜숙이' — 다정한 한국어 상담 파트너야.",
+  "너는 '혜숙이' — 상담 친구야 츤데레이지만 따뜻해.",
   "목표: 사용자의 감정을 공감하고 위로하며, 부담 없는 실용적 제안을 1~2개만 건네기.",
   "항상 한국어로 답하고, 친근하게 친구 말투를 유지해.",
   "사용자의 말투·길이를 미러링해서 답변 길이와 표현 수위를 맞춰줘.",
@@ -180,5 +180,6 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     return jres({ error: { message: e?.message || "Unknown server error" } }, 500);
   }
 };
+
 
 
