@@ -7,11 +7,16 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-QR5TWB3RYJ');
 </script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9891583086388017"
-     crossorigin="anonymous"></script>
+
+<!-- AdSense (Auto Ads) -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js?client=ca-pub-9891583086388017" crossorigin="anonymous"></script>
+<script>
+  // 상단 앵커 광고로 인한 "페이지 맨 위 하얀 공백" 방지: top 비활성화, bottom만 사용
+  window.adsbygoogle = window.adsbygoogle || [];
+  window.adsbygoogle.push({ overlays: { bottom: true, top: false } });
+</script>
 
 <meta name="naver-site-verification" content="fbe7ca9cbb5ebd5494222faf40a1bb1155581dff" />
 
@@ -29,7 +34,7 @@
 <link rel="apple-touch-icon" href="https://hyesugi.com/apple-touch-icon.png" sizes="180x180" />
 <link rel="manifest" href="https://hyesugi.com/site.webmanifest" />
 
-<!-- Open Graph (Facebook, Kakao, Slack 등) -->
+<!-- Open Graph -->
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="hyesugi.com" />
 <meta property="og:url" content="https://hyesugi.com/" />
@@ -50,61 +55,75 @@
 
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-    #chat-container::-webkit-scrollbar { width: 8px; }
-    #chat-container::-webkit-scrollbar-track { background: #f1f1f1; }
-    #chat-container::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
-    #chat-container::-webkit-scrollbar-thumb:hover { background: #555; }
+  /* 스크롤바 미세 스타일 */
+  #chat-container::-webkit-scrollbar { width: 8px; }
+  #chat-container::-webkit-scrollbar-track { background: #f1f1f1; }
+  #chat-container::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+  #chat-container::-webkit-scrollbar-thumb:hover { background: #555; }
+
+  /* 상단 앵커 광고가 body margin/padding을 바꾸는 경우 방어 */
+  html, body { margin-top: 0 !important; padding-top: 0 !important; }
+
+  /* iOS safe area 대응 */
+  :root { --kb-offset: 0px; }
+  #app { padding-bottom: var(--kb-offset); }
+
+  /* 입력창이 가려지지 않도록 footer를 살짝 띄워 줌 */
+  footer.sticky-safe {
+    position: sticky;
+    bottom: 0;
+  }
 </style>
 </head>
 <body class="bg-white font-sans">
 <div id="app" class="flex flex-col h-screen max-w-3xl mx-auto bg-[#9bbbd4]">
 
-<!-- Header + 햄버거 메뉴 버튼 -->
-<header class="bg-white/30 backdrop-blur-sm text-center py-4 shadow-md relative">
-  <h1 class="text-xl font-bold text-gray-800 flex items-center justify-center gap-2">
-    <a href="https://hyesugi.com" class="flex items-center justify-center gap-2" aria-label="hyesugi.com으로 이동">
-      <img src="https://hyesugi.com/hyesugi.jpg" alt="혜숙이" class="w-14 h-14 rounded-full object-cover">
-      당신의 상담친구 혜숙이
-    </a>
-  </h1>
-  <p class="text-sm text-gray-600">우측 메뉴를 눌러보세요</p>
+  <!-- Header + 햄버거 메뉴 버튼 -->
+  <header class="bg-white/30 backdrop-blur-sm text-center py-4 shadow-md relative">
+    <h1 class="text-xl font-bold text-gray-800 flex items-center justify-center gap-2">
+      <a href="https://hyesugi.com" class="flex items-center justify-center gap-2" aria-label="hyesugi.com으로 이동">
+        <img src="https://hyesugi.com/hyesugi.jpg" alt="혜숙이" class="w-14 h-14 rounded-full object-cover">
+        당신의 상담친구 혜숙이
+      </a>
+    </h1>
+    <p class="text-sm text-gray-600">우측 메뉴를 눌러보세요</p>
 
-  <!-- 햄버거 버튼 -->
-  <button id="menu-btn" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-white/60 focus:outline-none focus:ring-2 focus:ring-black/40" aria-label="메뉴 열기">
-    <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
-    </svg>
-  </button>
-</header>
+    <!-- 햄버거 버튼 -->
+    <button id="menu-btn" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-white/60 focus:outline-none focus:ring-2 focus:ring-black/40" aria-label="메뉴 열기">
+      <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
+      </svg>
+    </button>
+  </header>
 
-<!-- Chat Container -->
-<div id="chat-container" class="flex-1 p-4 overflow-y-auto space-y-4">
+  <!-- Chat Container -->
+  <div id="chat-container" class="flex-1 p-4 overflow-y-auto space-y-4">
     <div class="flex justify-start">
-        <div class="bg-white rounded-lg p-3 max-w-xs md:max-w-md shadow">
-            <p class="text-gray-800">안녕하세요, 혜숙이에요. 어떤 고민이 있으신가요? 당신의 이야기를 들어줄게요. 가정/학업/이성/금전/마음상태 뭐든지 편하게 말씀해주세요.</p>
-        </div>
+      <div class="bg-white rounded-lg p-3 max-w-xs md:max-w-md shadow">
+        <p class="text-gray-800">안녕하세요, 혜숙이에요. 어떤 고민이 있으신가요? 당신의 이야기를 들어줄게요. 가정/학업/이성/금전/마음상태 뭐든지 편하게 말씀해주세요.</p>
+      </div>
     </div>
-</div>
+  </div>
 
-<div id="loading" class="hidden flex items-center justify-start p-4">
+  <div id="loading" class="hidden flex items-center justify-start p-4">
     <div class="flex items-center space-x-2">
-        <div class="bg-white rounded-lg p-3 shadow flex items-center space-x-2">
-            <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: -0.3s;"></div>
-            <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: -0.15s;"></div>
-            <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-        </div>
+      <div class="bg-white rounded-lg p-3 shadow flex items-center space-x-2">
+        <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: -0.3s;"></div>
+        <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: -0.15s;"></div>
+        <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
+      </div>
     </div>
-</div>
+  </div>
 
-<!-- Footer -->
-<footer class="p-4 bg-white/30 backdrop-blur-sm">
+  <!-- Footer -->
+  <footer class="p-4 bg-white/30 backdrop-blur-sm sticky-safe">
     <div class="relative flex items-center">
-        <input type="text" id="user-input" class="w-full bg-white rounded-full py-3 pl-5 pr-14 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner" placeholder="메시지를 입력하세요...">
-        <button id="send-button" class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-        </button>
+      <input type="text" id="user-input" class="w-full bg-white rounded-full py-3 pl-5 pr-14 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner" placeholder="메시지를 입력하세요...">
+      <button id="send-button" class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+      </button>
     </div>
-</footer>
+  </footer>
 </div>
 
 <!-- Overlay & Drawer -->
@@ -124,95 +143,117 @@
     <a href="facereading" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">나의 관상은</a>
     <a href="handreading" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">나의 손금은</a>
     <a href="board" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">익명 게시판</a>
-<a href="expert" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">전문가 상담</a>
-<a href="solo" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">솔로는 여기</a>
-<a href="money" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">돈되는 정보</a>
-<a href="game" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">신나는 게임</a>
-<a href="info" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">이용 안내</a>
-<a href="#" id="share-btn" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">공유하기</a>
-
+    <a href="expert" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">전문가 상담</a>
+    <a href="solo" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">솔로는 여기</a>
+    <a href="money" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">돈되는 정보</a>
+    <a href="game" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">신나는 게임</a>
+    <a href="info" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">이용 안내</a>
+    <a href="#" id="share-btn" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">공유하기</a>
   </nav>
 </aside>
 
 <script>
+/* -------------------- 채팅 상태 -------------------- */
 const chatContainer = document.getElementById('chat-container');
 const userInput = document.getElementById('user-input');
 const sendButton = document.getElementById('send-button');
 const loadingIndicator = document.getElementById('loading');
-
-// 대화 기록 저장
 let conversationHistory = [];
 
-// 시스템 메시지
+/* -------------------- 시스템 메시지 -------------------- */
 const systemMessage = {
-    role: 'system',
-    content: "You are '혜숙이', a professional counselor and a warm-hearted friend. Your role is to listen to the user's concerns, provide comfort, and offer counseling. You must always respond in Korean, using a gentle and empathetic tone. Keep your answers concise and supportive. As the conversation continues, make the user feel more familiar and reliant. Don't use Chinese characters or ** marks."
+  role: 'system',
+  content: "You are '혜숙이', a professional counselor and a warm-hearted friend. Your role is to listen to the user's concerns, provide comfort, and offer counseling. You must always respond in Korean, using a gentle and empathetic tone. Keep your answers concise and supportive. As the conversation continues, make the user feel more familiar and reliant. Don't use Chinese characters or ** marks."
 };
 
-// 메시지 출력
+/* -------------------- 메시지 그리기 + 자동 스크롤 -------------------- */
 function addMessageToChat(message, sender) {
-    const messageWrapper = document.createElement('div');
-    messageWrapper.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+  const messageWrapper = document.createElement('div');
+  messageWrapper.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
 
-    const messageBubble = document.createElement('div');
-    messageBubble.className = `rounded-lg p-3 max-w-xs md:max-w-md shadow ${sender === 'user' ? 'bg-[#FFCD50] text-gray-800' : 'bg-white text-gray-800'}`;
-    messageBubble.innerText = message;
-    
-    messageWrapper.appendChild(messageBubble);
-    chatContainer.appendChild(messageWrapper);
+  const messageBubble = document.createElement('div');
+  messageBubble.className = `rounded-lg p-3 max-w-xs md:max-w-md shadow ${sender === 'user' ? 'bg-[#FFCD50] text-gray-800' : 'bg-white text-gray-800'}`;
+  messageBubble.innerText = message;
 
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+  messageWrapper.appendChild(messageBubble);
+  chatContainer.appendChild(messageWrapper);
+
+  smartScrollToBottom(true);
 }
 
-// AI 응답
+// 부드럽고 확실한 스크롤 고정
+function smartScrollToBottom(smooth = false) {
+  // 두 번의 rAF + setTimeout으로 렌더/이미지/폰트 지연 보정
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      chatContainer.scrollTo({
+        top: chatContainer.scrollHeight,
+        behavior: smooth ? 'smooth' : 'auto'
+      });
+      setTimeout(() => {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }, 50);
+    });
+  });
+}
+
+// 새로운 메시지가 들어오면 하단 고정(사용자가 위로 스크롤 중일 땐 유지)
+let autoStick = true;
+chatContainer.addEventListener('scroll', () => {
+  const nearBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 80;
+  autoStick = nearBottom;
+});
+const observer = new MutationObserver(() => { if (autoStick) smartScrollToBottom(); });
+observer.observe(chatContainer, { childList: true, subtree: true });
+
+/* -------------------- OpenAI 호출 -------------------- */
 async function getAIResponse() {
-    const userMessage = userInput.value.trim();
-    if (userMessage === '') return;
+  const userMessage = userInput.value.trim();
+  if (!userMessage) return;
 
-    addMessageToChat(userMessage, 'user');
-    conversationHistory.push({ role: 'user', content: userMessage });
-    userInput.value = '';
-    loadingIndicator.classList.remove('hidden');
+  addMessageToChat(userMessage, 'user');
+  conversationHistory.push({ role: 'user', content: userMessage });
+  userInput.value = '';
+  loadingIndicator.classList.remove('hidden');
 
-    try {
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                model: 'deepseek-chat',
-                messages: [systemMessage, ...conversationHistory]
-            })
-        });
-        
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error.message || 'API 호출에 실패했습니다.');
-        }
+  try {
+    const response = await fetch('/api/chatGPT', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [systemMessage, ...conversationHistory]
+      })
+    });
 
-        const data = await response.json();
-        const aiMessage = data.choices[0].message.content;
-
-        addMessageToChat(aiMessage, 'ai');
-        conversationHistory.push({ role: 'assistant', content: aiMessage });
-
-    } catch (error) {
-        console.error('Error:', error);
-        addMessageToChat('죄송해요, 지금은 답변을 드릴 수 없어요. 잠시 후 다시 시도해주세요.', 'ai');
-    } finally {
-        loadingIndicator.classList.add('hidden');
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(errText || 'API 호출 실패');
     }
+
+    const data = await response.json();
+    const aiMessage = data.choices?.[0]?.message?.content || '죄송해요, 지금은 답변을 드릴 수 없어요.';
+
+    addMessageToChat(aiMessage, 'ai');
+    conversationHistory.push({ role: 'assistant', content: aiMessage });
+  } catch (error) {
+    console.error('Error:', error);
+    addMessageToChat('죄송해요, 지금은 답변을 드릴 수 없어요. 잠시 후 다시 시도해주세요.', 'ai');
+  } finally {
+    loadingIndicator.classList.add('hidden');
+  }
 }
 
-// 이벤트 리스너
+/* -------------------- 이벤트 -------------------- */
 sendButton.addEventListener('click', getAIResponse);
-userInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
-        event.preventDefault();
-        getAIResponse();
-    }
+userInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    getAIResponse();
+  }
 });
 
-// === Drawer Toggle ===
+/* -------------------- Drawer -------------------- */
 const menuBtn = document.getElementById('menu-btn');
 const drawer = document.getElementById('drawer');
 const drawerOverlay = document.getElementById('drawer-overlay');
@@ -231,7 +272,7 @@ drawerOverlay.addEventListener('click', closeDrawer);
 drawerClose.addEventListener('click', closeDrawer);
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
 
-// === Share Button ===
+/* -------------------- 공유 버튼 -------------------- */
 const shareBtn = document.getElementById('share-btn');
 if (shareBtn) {
   shareBtn.addEventListener('click', async (e) => {
@@ -255,6 +296,44 @@ if (shareBtn) {
   });
 }
 
+/* -------------------- AdSense 상단 공백 방지 (보수적 가드) -------------------- */
+// 일부 환경에서 Auto Ads가 body에 marginTop/paddingTop을 강제로 주는 케이스 방지
+const bodyStyleGuard = new MutationObserver(() => {
+  const st = document.body.style;
+  if (st.marginTop && st.marginTop !== '0px') st.marginTop = '0px';
+  if (st.paddingTop && st.paddingTop !== '0px') st.paddingTop = '0px';
+});
+bodyStyleGuard.observe(document.body, { attributes: true, attributeFilter: ['style'] });
+
+/* -------------------- 모바일 키보드 대응: 입력창 항상 보이기 -------------------- */
+// 1) 시각적 뷰포트 변화를 감지하여 하단 패딩을 줘서 입력창 가림 방지
+function applyViewportPadding() {
+  if (window.visualViewport) {
+    const vv = window.visualViewport;
+    const bottomInset = (window.innerHeight - vv.height - vv.offsetTop);
+    // iOS Safari 등에서 키보드가 올라오면 bottomInset > 0
+    document.documentElement.style.setProperty('--kb-offset', Math.max(0, bottomInset) + 'px');
+    smartScrollToBottom(); // 키보드 전개 후에도 최신 메시지 보이게
+  }
+}
+if (window.visualViewport) {
+  visualViewport.addEventListener('resize', applyViewportPadding);
+  visualViewport.addEventListener('scroll', applyViewportPadding);
+}
+window.addEventListener('orientationchange', () => setTimeout(applyViewportPadding, 200));
+
+// 2) 입력창 포커스 시, 항상 보이도록 스크롤 고정
+function focusScrollFix() {
+  setTimeout(() => {
+    userInput.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    window.scrollTo({ top: document.body.scrollHeight });
+    smartScrollToBottom(true);
+  }, 50);
+}
+userInput.addEventListener('focus', focusScrollFix);
+
+// 초기 한번 적용
+applyViewportPadding();
 </script>
 
 <footer id="site-footer" class="text-center text-sm text-gray-700 py-6 space-y-2">
@@ -266,7 +345,6 @@ if (shareBtn) {
     </a>
   </div>
 
-  <!-- 연한 구분선 -->
   <hr class="border-t border-gray-300 opacity-50 w-2/3 mx-auto">
 
   <!-- 🔀 랜덤 광고 줄 -->
