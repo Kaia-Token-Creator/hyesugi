@@ -55,14 +55,16 @@
     #chat-container::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
     #chat-container::-webkit-scrollbar-thumb:hover { background: #555; }
 
-:root { --anchorH: 75px; --kb: 0px; } /* ← --kb: 키보드 높이(기본 0) */
+:root { --anchorH: 80px; --kb: 0px; --kbGap: 0px; } /* kbGap = 키보드 위 여백 */
 
 #app{
-  padding-bottom: calc(var(--anchorH) + env(safe-area-inset-bottom) + var(--kb)); /* ← 추가 */
+  /* 키보드 높이 제거: 앵커 + 세이프영역만 */
+  padding-bottom: calc(var(--anchorH) + env(safe-area-inset-bottom));
 }
 #chat-footer{
   position: sticky;
-  bottom: calc(var(--anchorH) + env(safe-area-inset-bottom) + var(--kb)); /* ← 추가 */
+  /* 키보드가 없으면 anchorH, 있으면 kb + kbGap 을 사용 */
+  bottom: calc(max(var(--anchorH), calc(var(--kb) + var(--kbGap))) + env(safe-area-inset-bottom));
   z-index: 30;
 }
 
@@ -365,3 +367,4 @@ if (shareBtn) {
 </script>
 </body>
 </html>
+
