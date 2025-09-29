@@ -54,10 +54,25 @@
     #chat-container::-webkit-scrollbar-track { background: #f1f1f1; }
     #chat-container::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
     #chat-container::-webkit-scrollbar-thumb:hover { background: #555; }
+
+:root { --anchorH: 72px; } /* 앵커 광고 대략 높이(필요시 숫자만 조절) */
+
+#app{
+  /* 앵커광고 + 안전영역 만큼 하단 여백 확보 */
+  padding-bottom: calc(var(--anchorH) + env(safe-area-inset-bottom));
+}
+
+/* 채팅 입력창을 항상 보이게 하단에 '붙이되' 앵커광고만큼 띄움 */
+#chat-footer{
+  position: sticky;
+  bottom: calc(var(--anchorH) + env(safe-area-inset-bottom));
+  z-index: 30; /* 앵커광고 아래로 깔리지 않게 */
+}
+
 </style>
 </head>
 <body class="bg-white font-sans">
-<div id="app" class="flex flex-col h-screen max-w-3xl mx-auto bg-[#9bbbd4]">
+<div id="app" class="flex flex-col min-h-[100svh] max-w-3xl mx-auto bg-[#9bbbd4]">
 
 <!-- Header + 햄버거 메뉴 버튼 -->
 <header class="bg-white/30 backdrop-blur-sm text-center py-4 shadow-md relative">
@@ -97,13 +112,13 @@
 </div>
 
 <!-- Footer -->
-<footer class="p-4 bg-white/30 backdrop-blur-sm">
-    <div class="relative flex items-center">
-        <input type="text" id="user-input" class="w-full bg-white rounded-full py-3 pl-5 pr-14 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner" placeholder="메시지를 입력하세요...">
-        <button id="send-button" class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-        </button>
-    </div>
+<footer id="chat-footer" class="p-4 bg-white/30 backdrop-blur-sm">
+  <div class="relative flex items-center">
+    <input type="text" id="user-input" class="w-full bg-white rounded-full py-2 pl-5 pr-14 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner" placeholder="메시지를 입력하세요...">
+    <button id="send-button" class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-black rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+      <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+    </button>
+  </div>
 </footer>
 </div>
 
@@ -146,7 +161,21 @@ let conversationHistory = [];
 // 시스템 메시지
 const systemMessage = {
     role: 'system',
-    content: "You are '혜숙이', a professional counselor and a warm-hearted friend. Your role is to listen to the user's concerns, provide comfort, and offer counseling. You must always respond in Korean, using a gentle and empathetic tone. Keep your answers concise and supportive. As the conversation continues, make the user feel more familiar and reliant. Don't use Chinese characters or ** marks."
+    content: [
+    "너는 '혜숙이' — 다정한 한국어 상담 친구야.",
+    "목표: 사용자의 감정에 공감하고 위로하며, 부담 없는 실용적 조언을 제공해.",
+    "반드시 한국어로 답하고, 친근하지만 친구 같은 말투를 사용해.",
+    "사용자의 말투·길이를 '미러링'해서 답변 길이와 표현 수위를 맞춰줘.",
+    "첫 문장은 공감/인정(예: '그 마음, 정말 힘들었겠다').",
+    "그 다음은 작은 제안 1~2개만, 과한 해결책 나열 금지.",
+    "전문적 치료·법률 판단이 필요한 상황은 진단 대신 전문가 상담을 권유해.",
+    "자해/타해·위기 신호가 보이면 안전을 최우선으로 하고, 지역 긴급번호·상담기관 도움을 권유해.",
+    "모델·토큰·시스템 같은 기술 용어는 언급하지 마. 사람이 대화하듯 자연스럽게.",
+    "직접 묻지 않는 이상 스스로 'AI'라고 밝히지 마. (단, 물으면 정직하게 밝히고 따뜻하게 대화 이어가기)",
+    "과장·단정·판단 단어는 피하고, 따뜻하고 담백하게.",
+    "불필요한 이모지는 자제하되, 정말 위로가 될 때만 적게 사용해.",
+    "중국어 한자·특수 기호(** 등)는 사용하지 마."
+  ].join("\n")
 };
 
 // 메시지 출력
