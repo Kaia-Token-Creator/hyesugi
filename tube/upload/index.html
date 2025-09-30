@@ -11,93 +11,101 @@
 </script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9891583086388017"
      crossorigin="anonymous"></script>
-  
+
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Tube 글 생성기 — hyesugi.com</title>
   <meta name="description" content="번호/제목/유튜브 링크/리뷰를 입력하면 hyesugi.com/tube/번호 형태의 완성 HTML을 생성합니다." />
-  <meta name="robots" content="noindex,nofollow" />
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="robots" content="noindex, nofollow" />
   <style>
-    :root{ color-scheme: light; }
-    textarea { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    :root{--bg:#f6f7fb;--ink:#111;--brand:#9bbbd4;}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Malgun Gothic,'맑은 고딕',sans-serif}
+    .wrap{max-width:960px;margin:24px auto;padding:16px}
+    h1{font-size:20px;margin:0 0 12px}
+    .card{background:#fff;border-radius:14px;box-shadow:0 8px 22px rgba(0,0,0,.06);padding:16px}
+    label{display:block;font-weight:700;margin:10px 0 6px}
+    input[type="text"], textarea{
+      width:100%;padding:10px 12px;border:1px solid #e4e6eb;border-radius:10px;background:#fcfcfd;
+      font:14px/1.4 inherit;outline:none
+    }
+    textarea{min-height:90px;resize:vertical}
+    .row{display:grid;grid-template-columns:1fr;gap:12px}
+    @media (min-width:720px){.row{grid-template-columns:160px 1fr}}
+    .hint{color:#666;font-size:12px;margin-top:4px}
+    .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+    button{
+      cursor:pointer;border:0;border-radius:10px;padding:10px 14px;font-weight:700
+    }
+    .primary{background:#111;color:#fff}
+    .ghost{background:#f2f3f7}
+    .ok{background:#1a73e8;color:#fff}
+    .out{margin-top:16px}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    #result{min-height:360px;white-space:pre}
+    .foot{opacity:.7;font-size:12px;margin-top:12px}
+    .k{background:#fffae0;padding:8px;border-radius:8px;border:1px dashed #f0d98a}
+    .badge{display:inline-block;background:var(--brand);color:#000;padding:2px 8px;border-radius:999px;font-size:12px;margin-left:6px}
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
-  <div class="max-w-5xl mx-auto p-6 space-y-6">
-    <header class="flex items-center justify-between">
-      <h1 class="text-2xl font-extrabold">hyesugi — Tube HTML 생성기</h1>
-      <a href="https://hyesugi.com" class="text-sm text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">사이트 열기</a>
-    </header>
-
-    <!-- 입력 폼 -->
-    <section class="bg-white rounded-2xl shadow p-5 space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <label class="block">
-          <span class="block text-sm font-semibold">번호 (예: 001)</span>
-          <input id="num" type="text" placeholder="001" class="mt-1 w-full rounded-lg border px-3 py-2" />
-        </label>
-        <label class="block md:col-span-2">
-          <span class="block text-sm font-semibold">제목</span>
-          <input id="title" type="text" placeholder="가격 때문에 논란 중인 이효리 요가원" class="mt-1 w-full rounded-lg border px-3 py-2" />
-        </label>
-      </div>
-
-      <label class="block">
-        <span class="block text-sm font-semibold">유튜브 링크</span>
-        <input id="yt" type="url" placeholder="https://youtube.com/shorts/-_-O3QgyLB4?si=LnuqFpfUtc5klfCk" class="mt-1 w-full rounded-lg border px-3 py-2" />
-      </label>
-
-      <label class="block">
-        <span class="block text-sm font-semibold">리뷰 (노란 박스에 들어갑니다)</span>
-        <textarea id="review" rows="6" placeholder="여기에 리뷰를 입력하세요. 줄바꿈 유지됨." class="mt-1 w-full rounded-lg border px-3 py-2"></textarea>
-      </label>
-
-      <div class="flex flex-wrap gap-3">
-        <button id="makeBtn" class="bg-black text-white px-4 py-2 rounded-lg">HTML 생성</button>
-        <button id="copyBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg" disabled>복사하기</button>
-      </div>
-    </section>
-
-    <!-- 출력 -->
-    <section class="bg-white rounded-2xl shadow p-5 space-y-3">
-      <div class="flex items-center justify-between">
-        <h2 class="font-bold">생성된 HTML</h2>
-        <div class="text-sm text-slate-500">완성 후 /tube/번호/ 에 <code>index.html</code>로 업로드</div>
-      </div>
-      <textarea id="out" rows="28" class="w-full rounded-lg border p-3" placeholder="여기에 결과 HTML이 출력됩니다" readonly></textarea>
-      <details class="mt-2">
-        <summary class="cursor-pointer text-sm text-slate-600">파일 경로 가이드</summary>
-        <div class="text-sm text-slate-700 mt-2 space-y-1">
-          <div>- 업로드 경로: <code>/tube/번호/index.html</code></div>
-          <div>- 썸네일: <code>/tube/번호/preview.jpg</code> (메타태그/OG/Twitter에서 사용)</div>
+<body>
+  <div class="wrap">
+    <h1>Tube 글 생성기 <span class="badge">코드만 출력</span></h1>
+    <div class="card">
+      <div class="row">
+        <div>
+          <label for="num">번호</label>
+          <input id="num" type="text" placeholder="예: 001" inputmode="numeric" />
+          <div class="hint">경로/미리보기 이미지에 사용됨: <span class="k">/tube/번호</span>, <span class="k">/tube/번호/preview.jpg</span></div>
         </div>
-      </details>
-    </section>
+        <div>
+          <label for="title">제목</label>
+          <input id="title" type="text" placeholder="예: 가격 때문에 논란 중인 이효리 요가원" />
+        </div>
+      </div>
+
+      <label for="yt">유튜브 링크</label>
+      <input id="yt" type="text" placeholder="예: https://youtube.com/shorts/XXXXX 또는 https://www.youtube.com/watch?v=VIDEO_ID" />
+
+      <label for="review">리뷰</label>
+      <textarea id="review" placeholder="리뷰를 입력하세요. 줄바꿈은 유지됩니다."></textarea>
+
+      <div class="btns">
+        <button class="primary" id="make">코드 생성</button>
+        <button class="ok" id="copy" title="아래 결과 전체를 복사합니다">복사</button>
+        <button class="ghost" id="clear">초기화</button>
+      </div>
+
+      <div class="out">
+        <label for="result">생성된 HTML</label>
+        <textarea id="result" class="mono" spellcheck="false" readonly></textarea>
+      </div>
+
+      <div class="foot">
+        ※ 미리보기/렌더링 없이 <b>텍스트로만</b> 출력합니다. 필요한 경우 그대로 파일로 저장해 업로드하세요.
+      </div>
+    </div>
   </div>
 
   <script>
+    // 간단한 HTML 이스케이프
+    const esc = (s='') => String(s)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+
+    // 리뷰: 줄바꿈 → <br>
+    const toHtmlLines = (s='') => esc(s).replace(/\r?\n/g,'<br>');
+
     const $ = sel => document.querySelector(sel);
     const numEl = $('#num');
     const titleEl = $('#title');
     const ytEl = $('#yt');
     const reviewEl = $('#review');
-    const outEl = $('#out');
-    const makeBtn = $('#makeBtn');
-    const copyBtn = $('#copyBtn');
+    const outEl = $('#result');
 
-    function escAttr(s=''){ return s.replaceAll('"','&quot;'); }
-    function escHtml(s=''){ return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
-    function toDescription(title){ return title.trim(); } // 예시처럼 title=description 사용
-
-    function buildHTML({num, title, yt, review}) {
-      const desc = toDescription(title);
-      const base = `https://hyesugi.com/tube/${num}`;
-      const ogImg = `${base}/preview.jpg`;
-      const reviewHTML = escHtml(review).replaceAll('\n','<br>');
-
-      // === 아래 템플릿은 사용자 예시에 맞춰 구성됨 ===
-      return `<!DOCTYPE html>
+    const template = ({num, title, yt, reviewHtml}) => `<!DOCTYPE html>
 <html lang="ko">
 <head>
 <!-- Google tag (gtag.js) -->
@@ -108,47 +116,51 @@
   gtag('js', new Date());
   gtag('config', 'G-QR5TWB3RYJ');
 </script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9891583086388017" crossorigin="anonymous"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9891583086388017"
+     crossorigin="anonymous"></script>
 
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <!-- 기본 설정 -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-<!-- ▼▼▼ 메타태그(제목/설명/OG/Twitter) — 폼 입력값으로 자동 채움 ▼▼▼ -->
-<title>${escHtml(title)}</title>
-<meta name="description" content="${escAttr(desc)}" />
-<link rel="canonical" href="${base}" />
-<meta name="robots" content="index,follow" />
-<meta name="theme-color" content="#9bbbd4" />
+  <!-- ▼▼▼ 메타태그 가이드 ▼▼▼ -->
+  <title>${esc(title)}</title>
+  <meta name="description" content="${esc(title)}" />
+  <link rel="canonical" href="https://hyesugi.com/tube/${esc(num)}" />
+  <meta name="robots" content="index,follow" />
+  <meta name="theme-color" content="#9bbbd4" />
 
-<!-- Favicon & App Icons -->
-<link rel="icon" href="https://hyesugi.com/favicon.ico" sizes="any" />
-<link rel="apple-touch-icon" href="https://hyesugi.com/apple-touch-icon.png" sizes="180x180" />
-<link rel="manifest" href="https://hyesugi.com/site.webmanifest" />
+  <!-- Favicon & App Icons -->
+  <link rel="icon" href="https://hyesugi.com/favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="https://hyesugi.com/apple-touch-icon.png" sizes="180x180" />
+  <link rel="manifest" href="https://hyesugi.com/site.webmanifest" />
 
-<!-- Open Graph -->
-<meta property="og:type" content="website" />
-<meta property="og:site_name" content="${base}" />
-<meta property="og:url" content="${base}" />
-<meta property="og:title" content="${escAttr(title)}" />
-<meta property="og:description" content="${escAttr(desc)}" />
-<meta property="og:image" content="${ogImg}" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="${ogImg}" />
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="https://hyesugi.com/tube/${esc(num)}" />
+  <meta property="og:url" content="https://hyesugi.com/tube/${esc(num)}" />
+  <meta property="og:title" content="${esc(title)}" />
+  <meta property="og:description" content="${esc(title)}" />
+  <meta property="og:image" content="https://hyesugi.com/tube/${esc(num)}/preview.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="https://hyesugi.com/tube/${esc(num)}/preview.jpg" />
 
-<!-- Twitter (X) Card -->
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="${escAttr(title)}" />
-<meta name="twitter:description" content="${escAttr(desc)}" />
-<meta name="twitter:image" content="${ogImg}" />
+  <!-- Twitter (X) Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${esc(title)}" />
+  <meta name="twitter:description" content="${esc(title)}" />
+  <meta name="twitter:image" content="https://hyesugi.com/tube/${esc(num)}/preview.jpg" />
 
-<link rel="preload" as="image" href="${ogImg}" imagesrcset="${ogImg}" />
-<script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preload" as="image" href="https://hyesugi.com/tube/${esc(num)}/preview.jpg" imagesrcset="https://hyesugi.com/tube/${esc(num)}/preview.jpg" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-white font-sans">
   <div id="app" class="flex flex-col min-h-screen max-w-3xl mx-auto bg-[#9bbbd4]">
 
-    <!-- Header -->
+    <!-- Header + 햄버거 메뉴 버튼 -->
     <header class="bg-white/30 backdrop-blur-sm text-center py-4 shadow-md relative">
       <h1 class="text-xl font-bold text-gray-800 flex items-center justify-center gap-2">
         <a href="https://hyesugi.com" class="flex items-center justify-center gap-2" aria-label="hyesugi.com으로 이동">
@@ -157,16 +169,24 @@
         </a>
       </h1>
       <p class="text-sm text-gray-600">우측 메뉴를 눌러보세요</p>
+
+      <!-- 햄버거 버튼 -->
       <button id="menu-btn" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-white/60 focus:outline-none focus:ring-2 focus:ring-black/40" aria-label="메뉴 열기">
-        <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
+        </svg>
       </button>
     </header>
 
-    <!-- 본문 -->
+    <!-- 공통 본문 컨테이너: 각 페이지는 여기만 수정 -->
     <main id="content" class="flex-1 p-4">
+
+      <!-- ▼▼▼ 여기부터 “영상 포스트” 블럭 ▼▼▼ -->
       <section id="video-post" class="space-y-4">
         <!-- (1) 제목 -->
-        <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight">${escHtml(title)}</h2>
+        <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight">
+          ${esc(title)}
+        </h2>
 
         <!-- (2) YouTube embed -->
         <div class="w-full rounded-xl overflow-hidden shadow-md bg-white">
@@ -174,39 +194,47 @@
             <iframe
               id="yt-iframe"
               class="absolute left-0 top-0 w-full h-full"
-              src=""
-              title="YouTube video player"
-              frameborder="0"
+              src="" title="YouTube video player" frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowfullscreen
-              data-youtube-url="${escAttr(yt)}">
+              data-youtube-url="${esc(yt)}">
             </iframe>
           </div>
         </div>
 
-        <!-- (3) 리뷰 (노란 박스) -->
+        <!-- (3) 리뷰 -->
         <div class="bg-[#FFCD50] text-black rounded-xl p-4 shadow leading-relaxed">
-          <p class="font-semibold">${reviewHTML}</p>
+          <p class="font-semibold">${reviewHtml}</p>
         </div>
 
         <!-- (4) 이 페이지 공유 버튼 -->
         <div class="pt-2">
-          <button id="inline-share-btn" class="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-black text-white px-4 py-2 rounded-lg shadow hover:opacity-90 active:scale-[0.99] transition" aria-label="이 페이지 공유하기">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4m0 0L8 6m4-4v16"/></svg>
+          <button id="inline-share-btn"
+                  class="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-black text-white px-4 py-2 rounded-lg shadow hover:opacity-90 active:scale-[0.99] transition"
+                  aria-label="이 페이지 공유하기">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4m0 0L8 6m4-4v16"/>
+            </svg>
             이 페이지 공유하기
           </button>
         </div>
+
       </section>
+      <!-- ▲▲▲ “영상 포스트” 블럭 끝 ▲▲▲ -->
+
     </main>
   </div>
 
-  <!-- Drawer -->
+  <!-- Overlay & Drawer -->
   <div id="drawer-overlay" class="fixed inset-0 bg-black/30 hidden z-40"></div>
   <aside id="drawer" class="fixed right-0 top-0 h-full w-1/2 max-w-md bg-white shadow-xl translate-x-full transition-transform duration-300 z-50">
     <div class="flex items-center justify-between p-4 border-b">
       <h2 class="font-bold text-gray-800">메뉴</h2>
       <button id="drawer-close" class="p-2 rounded-md hover:bg-gray-100" aria-label="메뉴 닫기">
-        <svg class="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        <svg class="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
       </button>
     </div>
     <nav class="p-4 space-y-2">
@@ -226,130 +254,179 @@
     </nav>
   </aside>
 
-  <!-- 스크립트: 드로어/공유/임베드/인라인공유/광고 -->
+  <!-- 공통 스크립트: 드로어 + 공유 + 유튜브 임베드 변환 -->
   <script>
-    // Drawer
+    // === Drawer Toggle ===
     const menuBtn = document.getElementById('menu-btn');
     const drawer = document.getElementById('drawer');
     const drawerOverlay = document.getElementById('drawer-overlay');
     const drawerClose = document.getElementById('drawer-close');
-    function openDrawer(){drawer.classList.remove('translate-x-full');drawerOverlay.classList.remove('hidden');}
-    function closeDrawer(){drawer.classList.add('translate-x-full');drawerOverlay.classList.add('hidden');}
+
+    function openDrawer() {
+      drawer.classList.remove('translate-x-full');
+      drawerOverlay.classList.remove('hidden');
+    }
+    function closeDrawer() {
+      drawer.classList.add('translate-x-full');
+      drawerOverlay.classList.add('hidden');
+    }
     menuBtn?.addEventListener('click', openDrawer);
     drawerOverlay?.addEventListener('click', closeDrawer);
     drawerClose?.addEventListener('click', closeDrawer);
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeDrawer(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
 
-    // Drawer Share
+    // === Share Button ===
     const shareBtn = document.getElementById('share-btn');
-    if (shareBtn){
-      shareBtn.addEventListener('click', async (e)=>{
+    if (shareBtn) {
+      shareBtn.addEventListener('click', async (e) => {
         e.preventDefault();
-        const shareData = { title: document.title || '혜숙이의 상담소', text: '다정한 AI 상담가 혜숙이와 대화해 보세요.', url: location.href };
-        try{
-          if(navigator.share){ await navigator.share(shareData); }
-          else { await navigator.clipboard.writeText(shareData.url); alert('링크가 클립보드에 복사되었습니다: ' + shareData.url); }
-        }catch(err){ console.error(err); alert('공유에 실패했어요. 잠시 후 다시 시도해 주세요.');}
+        const shareData = {
+          title: document.title || '혜숙이의 상담소',
+          text: '다정한 AI 상담가 혜숙이와 대화해 보세요.',
+          url: location.href
+        };
+        try {
+          if (navigator.share) {
+            await navigator.share(shareData);
+          } else {
+            await navigator.clipboard.writeText(shareData.url);
+            alert('링크가 클립보드에 복사되었습니다: ' + shareData.url);
+          }
+        } catch (err) {
+          console.error(err);
+          alert('공유에 실패했어요. 잠시 후 다시 시도해 주세요.');
+        }
       });
     }
 
-    // YouTube URL -> embed 변환 (shorts 지원)
-    (function mountYouTubeEmbed(){
+    // === YouTube URL -> 임베드 변환 ===
+    (function mountYouTubeEmbed() {
       const iframe = document.getElementById('yt-iframe');
-      if(!iframe) return;
-      const raw = (iframe.getAttribute('data-youtube-url')||'').trim();
-      if(!raw){ return; }
+      if (!iframe) return;
+      const raw = (iframe.getAttribute('data-youtube-url') || '').trim();
+      if (!raw) return;
       let videoId = '';
-      try{
+      try {
         const u = new URL(raw);
-        if(u.hostname.includes('youtu.be')) videoId = u.pathname.replace('/','');
-        else if(u.hostname.includes('youtube.com')){
+        if (u.hostname.includes('youtu.be')) {
+          videoId = u.pathname.replace('/', '');
+        } else if (u.hostname.includes('youtube.com')) {
           videoId = u.searchParams.get('v') || '';
-          if(!videoId && u.pathname.startsWith('/shorts/')){
+          if (!videoId && u.pathname.startsWith('/shorts/')) {
             videoId = u.pathname.split('/shorts/')[1]?.split('/')[0] || '';
           }
         }
-      }catch(e){}
-      const embedSrc = videoId ? `https://www.youtube.com/embed/${videoId}` : raw;
+      } catch (e) {}
+      const embedSrc = videoId ? \`https://www.youtube.com/embed/\${videoId}\` : raw;
       iframe.src = embedSrc;
     })();
+  </script>
 
-    // Inline Share (노란 박스 아래 전용)
-    (function mountInlineShare(){
+  <script>
+    // === Inline Share Button (노란 박스 아래 전용) ===
+    (function mountInlineShare() {
       const btn = document.getElementById('inline-share-btn');
-      if(!btn) return;
+      if (!btn) return;
       const titleEl = document.querySelector('#video-post h2');
       const pageTitle = (titleEl?.textContent || document.title || '혜숙이의 상담소').trim();
-      const pageDesc = (document.querySelector('meta[name="description"]')?.content || '다정한 AI 상담가 혜숙이와 대화해 보세요.').trim();
-      const pageUrl = location.href;
+      const pageDesc = (document.querySelector('meta[name="description"]')?.content
+                        || '다정한 AI 상담가 혜숙이와 대화해 보세요.').trim();
+      const pageUrl  = location.href;
       const shareData = { title: pageTitle, text: pageDesc, url: pageUrl };
-      btn.addEventListener('click', async ()=>{
-        try{
-          if(navigator.share){ await navigator.share(shareData); }
-          else { await navigator.clipboard.writeText(pageUrl); alert('링크가 클립보드에 복사되었습니다: ' + pageUrl); }
-        }catch(err){ console.error(err); alert('공유에 실패했어요. 잠시 후 다시 시도해 주세요.');}
+
+      btn.addEventListener('click', async () => {
+        try {
+          if (navigator.share) {
+            await navigator.share(shareData);
+          } else {
+            await navigator.clipboard.writeText(pageUrl);
+            alert('링크가 클립보드에 복사되었습니다: ' + pageUrl);
+          }
+        } catch (err) {
+          console.error(err);
+          alert('공유에 실패했어요. 잠시 후 다시 시도해 주세요.');
+        }
       });
     })();
+  </script>
 
-    // 간단 광고 링크 (원문과 동일)
-    (function(){
-      const ads = [
-        { text: "인터넷 바꾸면 47만원 지급해드려요!", url: "https://iryan.kr/t73750ushf" },
-        { text: "1시간 투자, 월평균 148만원 버는 고효율 부업", url: "https://iryan.kr/t738hkv2k0" },
-        { text: "넷플릭스 글로벌 컨텐츠 잠금해제하는 방법", url: "https://hyesugi.com/vpn" },
-        { text: "인간으로 살아남기", url: "https://hyesugi.com/world" },
-        { text: "노트북, 데스크탑, 아이패드, 태블릿 초특가 구매", url: "https://hyesugi.com/refur" }
-      ];
-      const pick = ads[Math.floor(Math.random()*ads.length)];
-      const slot = document.getElementById('ad-slot');
-      if(slot){
-        const a = document.createElement('a');
-        a.href = pick.url; a.target='_blank'; a.rel='noopener noreferrer';
-        a.className = 'text-blue-600 font-bold underline';
-        a.textContent = pick.text;
-        slot.replaceChildren(a);
+  <footer id="site-footer" class="text-center text-sm text-gray-700 py-6 space-y-2">
+    <div>
+      <a href="https://hyesugi.com/donation" target="_blank" rel="noopener noreferrer"
+         class="text-black font-semibold hover:underline">
+         혜숙이에게 커피 한잔 사주기 ☕
+      </a>
+    </div>
+    <hr class="border-t border-gray-300 opacity-50 w-2/3 mx-auto">
+    <div id="ad-slot"></div>
+  </footer>
+
+  <script>
+    const ads = [
+      { text: "인터넷 바꾸면 47만원 지급해드려요!", url: "https://iryan.kr/t73750ushf" },
+      { text: "1시간 투자, 월평균 148만원 버는 고효율 부업", url: "https://iryan.kr/t738hkv2k0" },
+      { text: "넷플릭스 글로벌 컨텐츠 잠금해제하는 방법", url: "https://hyesugi.com/vpn" },
+      { text: "인간으로 살아남기", url: "https://hyesugi.com/world" },
+      { text: "노트북, 데스크탑, 아이패드, 태블릿 초특가 구매", url: "https://hyesugi.com/refur" }
+    ];
+    const pick = ads[Math.floor(Math.random() * ads.length)];
+    const slot = document.getElementById("ad-slot");
+    if (slot) {
+      const a = document.createElement("a");
+      a.href = pick.url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.className = "text-blue-600 font-bold underline";
+      a.textContent = pick.text;
+      slot.replaceChildren(a);
+    }
+  </script>
+
+</body>
+</html>`;
+
+    function build() {
+      const num = (numEl.value || '').trim();
+      const title = (titleEl.value || '').trim();
+      const yt = (ytEl.value || '').trim();
+      const review = (reviewEl.value || '').trim();
+
+      if (!num || !title || !yt || !review) {
+        alert('번호, 제목, 유튜브 링크, 리뷰를 모두 입력하세요.');
+        return;
       }
-    })();
-
-    // === 생성기 로직 ===
-    function validate() {
-      const num = numEl.value.trim();
-      const title = titleEl.value.trim();
-      const yt = ytEl.value.trim();
-      const review = reviewEl.value;
-      if (!/^\d{3,}$/.test(num)) return { ok:false, msg:'번호는 숫자 3자리 이상(예: 001)로 입력하세요.' };
-      if (!title) return { ok:false, msg:'제목을 입력하세요.' };
-      if (!yt) return { ok:false, msg:'유튜브 링크를 입력하세요.' };
-      if (!review) return { ok:false, msg:'리뷰를 입력하세요.' };
-      return { ok:true, data:{ num, title, yt, review } };
-    }
-
-    function buildPageHTML(data){
-      // num은 URL/이미지 경로에만 쓰이므로 buildHTML에서 그대로 처리
-      return buildHTML(data).replaceAll('https://hyesugi.com/tube/undefined', `https://hyesugi.com/tube/${data.num}`);
-    }
-
-    makeBtn.addEventListener('click', () => {
-      const v = validate();
-      if (!v.ok) { alert(v.msg); return; }
-      const html = buildHTML(v.data);
+      const html = template({
+        num,
+        title,
+        yt,
+        reviewHtml: toHtmlLines(review)
+      });
       outEl.value = html;
-      copyBtn.disabled = false;
-      // 텍스트 자동 선택(편의)
-      outEl.focus();
-      outEl.select();
-    });
+      outEl.scrollTop = 0;
+    }
 
-    copyBtn.addEventListener('click', async () => {
-      if (!outEl.value) return;
+    document.getElementById('make').addEventListener('click', build);
+    document.getElementById('copy').addEventListener('click', async () => {
+      if (!outEl.value) { alert('먼저 코드를 생성하세요.'); return; }
       try {
         await navigator.clipboard.writeText(outEl.value);
-        copyBtn.textContent = '복사 완료!';
-        setTimeout(()=> copyBtn.textContent='복사하기', 1200);
-      } catch (e) {
-        alert('클립보드 복사 실패. 수동 복사해주세요.');
+        alert('생성된 HTML 전체가 복사되었습니다.');
+      } catch(e) {
+        outEl.select(); document.execCommand('copy');
+        alert('클립보드 복사 완료(호환 모드).');
       }
     });
+    document.getElementById('clear').addEventListener('click', () => {
+      numEl.value = titleEl.value = ytEl.value = reviewEl.value = '';
+      outEl.value = '';
+      numEl.focus();
+    });
+
+    // 데모 값(원하면 주석 처리)
+    // numEl.value = '001';
+    // titleEl.value = '가격 때문에 논란 중인 이효리 요가원';
+    // ytEl.value = 'https://youtube.com/shorts/-_-O3QgyLB4?si=LnuqFpfUtc5klfCk';
+    // reviewEl.value = '여기에 리뷰를 입력하세요.\n두 번째 줄입니다.';
   </script>
 </body>
 </html>
