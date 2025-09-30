@@ -116,6 +116,21 @@
           <p class="font-semibold">와 근데 솔직히 이효리 요가원 가격 3만5천원이면 너무 반전 아니냐 ㅋㅋ 나 진짜 처음 보고는 0 하나 빠진 줄 알았음… 보통 연예인 프리미엄 붙으면 몇십만 원은 기본일 거라 생각했는데, 이 정도면 동네 요가원보다도 싼 거 같아서 괜히 더 의심스러워 ㅎㅎ 팬미팅 가도 3만5천원은 절대 안 되잖아 ㅠㅠ 그래서 팬들은 “이게 더 팬서비스다” 이런 얘기 나오고, 또 다른 사람들은 “연예인 이름값 치곤 너무 헐값이라 오히려 이상하다” 하고 있더라. 나도 애매하긴 한데 진짜 저 가격이면 나도 한 번 가보고 싶다ㅋㅋ 너희들 생각은 어때?</p>
          
         </div>
+
+<!-- (4) 이 페이지 공유 버튼 -->
+<div class="pt-2">
+  <button id="inline-share-btn"
+          class="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-black text-white px-4 py-2 rounded-lg shadow hover:opacity-90 active:scale-[0.99] transition"
+          aria-label="이 페이지 공유하기">
+    <!-- 아이콘 -->
+    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4m0 0L8 6m4-4v16"/>
+    </svg>
+    이 페이지 공유하기
+  </button>
+</div>
+
       </section>
       <!-- ▲▲▲ 여기까지 “영상 포스트” 블럭 ▲▲▲ -->
 
@@ -237,6 +252,39 @@
       iframe.src = embedSrc;
     })();
   </script>
+
+<script>
+  // === Inline Share Button (노란 박스 아래 전용) ===
+  (function mountInlineShare() {
+    const btn = document.getElementById('inline-share-btn');
+    if (!btn) return;
+
+    // 제목/설명은 h2와 <meta name="description"> 를 우선 사용
+    const titleEl = document.querySelector('#video-post h2');
+    const pageTitle = (titleEl?.textContent || document.title || '혜숙이의 상담소').trim();
+    const pageDesc = (document.querySelector('meta[name="description"]')?.content
+                      || '다정한 AI 상담가 혜숙이와 대화해 보세요.').trim();
+    const pageUrl  = location.href;
+
+    const shareData = { title: pageTitle, text: pageDesc, url: pageUrl };
+
+    btn.addEventListener('click', async () => {
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+        } else {
+          await navigator.clipboard.writeText(pageUrl);
+          alert('링크가 클립보드에 복사되었습니다: ' + pageUrl);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('공유에 실패했어요. 잠시 후 다시 시도해 주세요.');
+      }
+    });
+  })();
+</script>
+
+
 
   <footer id="site-footer" class="text-center text-sm text-gray-700 py-6 space-y-2">
     <!-- ☕ 고정 첫 줄 -->
