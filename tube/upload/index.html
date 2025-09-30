@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<!-- Google tag (gtag.js) -->
+  <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QR5TWB3RYJ"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-QR5TWB3RYJ');
 </script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9891583086388017"
      crossorigin="anonymous"></script>
-
+  
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Tube 글 생성기 — hyesugi.com</title>
@@ -57,7 +56,6 @@
       <div class="flex flex-wrap gap-3">
         <button id="makeBtn" class="bg-black text-white px-4 py-2 rounded-lg">HTML 생성</button>
         <button id="copyBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg" disabled>복사하기</button>
-        <button id="previewBtn" class="bg-emerald-600 text-white px-4 py-2 rounded-lg" disabled>미리보기</button>
       </div>
     </section>
 
@@ -67,7 +65,7 @@
         <h2 class="font-bold">생성된 HTML</h2>
         <div class="text-sm text-slate-500">완성 후 /tube/번호/ 에 <code>index.html</code>로 업로드</div>
       </div>
-      <textarea id="out" rows="24" class="w-full rounded-lg border p-3" placeholder="여기에 결과 HTML이 출력됩니다" readonly></textarea>
+      <textarea id="out" rows="28" class="w-full rounded-lg border p-3" placeholder="여기에 결과 HTML이 출력됩니다" readonly></textarea>
       <details class="mt-2">
         <summary class="cursor-pointer text-sm text-slate-600">파일 경로 가이드</summary>
         <div class="text-sm text-slate-700 mt-2 space-y-1">
@@ -75,15 +73,6 @@
           <div>- 썸네일: <code>/tube/번호/preview.jpg</code> (메타태그/OG/Twitter에서 사용)</div>
         </div>
       </details>
-    </section>
-
-    <!-- 미리보기 -->
-    <section class="bg-white rounded-2xl shadow p-5 space-y-3">
-      <div class="flex items-center justify-between">
-        <h2 class="font-bold">미리보기</h2>
-        <div class="text-sm text-slate-500">브라우저 렌더 확인용</div>
-      </div>
-      <iframe id="preview" class="w-full h-[640px] border rounded-lg" title="미리보기 (srcdoc)"></iframe>
     </section>
   </div>
 
@@ -96,8 +85,6 @@
     const outEl = $('#out');
     const makeBtn = $('#makeBtn');
     const copyBtn = $('#copyBtn');
-    const previewBtn = $('#previewBtn');
-    const previewFrame = $('#preview');
 
     function escAttr(s=''){ return s.replaceAll('"','&quot;'); }
     function escHtml(s=''){ return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
@@ -206,7 +193,7 @@
         <div class="pt-2">
           <button id="inline-share-btn" class="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-black text-white px-4 py-2 rounded-lg shadow hover:opacity-90 active:scale-[0.99] transition" aria-label="이 페이지 공유하기">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4m0 0L8 6m4-4v16"/></svg>
-            공유하기
+            이 페이지 공유하기
           </button>
         </div>
       </section>
@@ -283,7 +270,7 @@
           }
         }
       }catch(e){}
-      const embedSrc = videoId ? \`https://www.youtube.com/embed/\${videoId}\` : raw;
+      const embedSrc = videoId ? `https://www.youtube.com/embed/${videoId}` : raw;
       iframe.src = embedSrc;
     })();
 
@@ -323,11 +310,8 @@
         slot.replaceChildren(a);
       }
     })();
-  </script>
-</body>
-</html>`;
-    }
 
+    // === 생성기 로직 ===
     function validate() {
       const num = numEl.value.trim();
       const title = titleEl.value.trim();
@@ -340,13 +324,20 @@
       return { ok:true, data:{ num, title, yt, review } };
     }
 
+    function buildPageHTML(data){
+      // num은 URL/이미지 경로에만 쓰이므로 buildHTML에서 그대로 처리
+      return buildHTML(data).replaceAll('https://hyesugi.com/tube/undefined', `https://hyesugi.com/tube/${data.num}`);
+    }
+
     makeBtn.addEventListener('click', () => {
       const v = validate();
       if (!v.ok) { alert(v.msg); return; }
       const html = buildHTML(v.data);
       outEl.value = html;
       copyBtn.disabled = false;
-      previewBtn.disabled = false;
+      // 텍스트 자동 선택(편의)
+      outEl.focus();
+      outEl.select();
     });
 
     copyBtn.addEventListener('click', async () => {
@@ -359,12 +350,6 @@
         alert('클립보드 복사 실패. 수동 복사해주세요.');
       }
     });
-
-    previewBtn.addEventListener('click', () => {
-      if (!outEl.value) return;
-      previewFrame.setAttribute('srcdoc', outEl.value);
-    });
   </script>
 </body>
 </html>
-
