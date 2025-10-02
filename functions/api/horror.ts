@@ -155,7 +155,7 @@ JSON만 반환
       reset || chapter === 0
         ? `
 새로운 이야기의 1장을 작성.  
-- 현대 한국 배경, 상징 오브젝트 1~2개 설정(예: 부적, 낡은 사진, 종소리 등)  
+- 현대 한국 배경, 상징 오브젝트 창의적으로 1~2개 설정
 - 본문 120~180자(약 150자 내외)  
 - 숨은 단서 2개 이상  
 - choices에 A/B(각 6~20자)  
@@ -235,4 +235,5 @@ JSON만 반환
     return new Response(JSON.stringify({ error: String(e?.message || e) }), { status: 500, headers: corsHeaders });
   }
 };
+
 
