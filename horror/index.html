@@ -67,6 +67,18 @@
       letter-spacing: .2px;
     }
     ::selection { background:#700; color:#fff; }
+    /* 텍스트 입력 계열 요소를 빨간 궁서체로 */
+input, textarea, select {
+  color: var(--ink); /* 빨간색 글씨 */
+  font-family: "Gungsuh","GungSeo","Batang","Gowun Batang","Nanum Myeongjo",serif;
+  background-color: #000;   /* 검은 배경 */
+  border: 1px solid #444;   /* 경계선 어둡게 */
+  padding: 0.5rem;
+}
+input::placeholder, textarea::placeholder {
+  color: #800; /* 플레이스홀더도 붉은 느낌 */
+  font-family: "Gungsuh","GungSeo","Batang","Gowun Batang","Nanum Myeongjo",serif;
+}
   </style>
 </head> 
 
@@ -314,4 +326,5 @@
   </script>
 </body> 
 </html>
+
 
