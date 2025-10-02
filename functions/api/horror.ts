@@ -1,16 +1,16 @@
 // /functions/api/horror.ts
-export const onRequestPost: PagesFunction<{ GEMINI_API_KEY: string }> = async (context) => {
+export const onRequestPost: PagesFunction<{ OPENAI_API_KEY: string }> = async (context) => {
   const { request, env } = context;
 
   const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Cache-Control": "no-store",
   };
 
   if (request.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, {
+      headers: { ...corsHeaders, "Access-Control-Allow-Methods": "POST, OPTIONS", "Cache-Control": "no-store" },
+    });
   }
 
   try {
@@ -22,10 +22,10 @@ export const onRequestPost: PagesFunction<{ GEMINI_API_KEY: string }> = async (c
       reset?: boolean;
     }>();
 
-    if (!env.GEMINI_API_KEY) {
-      return new Response(JSON.stringify({ error: "Missing GEMINI_API_KEY" }), {
+    if (!env.OPENAI_API_KEY) {
+      return new Response(JSON.stringify({ error: "Missing OPENAI_API_KEY" }), {
         status: 500,
-        headers: corsHeaders,
+        headers: { ...corsHeaders, "Cache-Control": "no-store" },
       });
     }
 
@@ -33,24 +33,24 @@ export const onRequestPost: PagesFunction<{ GEMINI_API_KEY: string }> = async (c
     if (!sessionId || (chapter === undefined || chapter === null)) {
       return new Response(JSON.stringify({ error: "sessionId and chapter are required" }), {
         status: 400,
-        headers: corsHeaders,
+        headers: { ...corsHeaders, "Cache-Control": "no-store" },
       });
     }
 
-    // reset이면 과거 로그 무시, 아니면 최근 2장만 전달
+    // 🔧 reset이면 과거 로그 완전 무시, 아니어도 최근 2장만 전달(반복 모티프 억제)
     const effectiveLogAll = reset ? [] : (log || []);
     const effectiveLog = effectiveLogAll.slice(-2);
 
-    // === 시스템 프롬프트
+    // ✅ 분기 반영 지시 강화 (길이만 70~90자로 축소)
     const systemPrompt = `
-당신은 한국어 공포 소설 엔진입니다.  
+당신은 한국어 천재 공포 소설가입니다.  
 사용자의 선택(A 또는 B)에 따라 반드시 다른 사건 전개가 이어지도록 작성하세요.  
 이전 로그와 마지막 선택은 반드시 반영해야 하며, 같은 전개로 합치지 마세요.  
 
 반드시 JSON 하나의 객체만 반환(코드블록 금지):
 {
   "chapterNumber": number,
-  "text": string,                     // 각 장 120~180자(약 150자 내외)
+  "text": string,                     // 각 장 70~90자(약 80자 내외)
   "choices": { "A": string, "B": string } | null,
   "isFinal": boolean,
   "finalLine"?: string                // 10장에서만: 6~20자 한 문장(소름 돋는 한마디)
@@ -59,7 +59,7 @@ export const onRequestPost: PagesFunction<{ GEMINI_API_KEY: string }> = async (c
 규칙:
 - 1~9장은 choices 제공, 10장은 choices=null, isFinal=true
 - 각 장은 반드시 분기된 선택의 결과로 이어질 것
-- 각 장 120~180자(약 150자 내외)
+- 각 장 70~90자(약 80자 내외)
 - 인물/오브젝트/시간 흐름의 일관성 유지, 단서와 떡밥은 이어져야 함
 - 과도한 고어·차별·실존인물 모욕 금지
 - 10장은 "엄청난 반전"과 "강렬한 공포 분위기"를 담고, 마지막 한마디는 finalLine에 별도로 넣기
@@ -74,7 +74,7 @@ export const onRequestPost: PagesFunction<{ GEMINI_API_KEY: string }> = async (c
         ? `
 새로운 이야기의 1장을 작성.  
 - 현대 한국 배경, 오브젝트와 단서를 창의적으로 설정  
-- 본문 120~180자(약 150자 내외)  
+- 본문 70~90자(약 80자 내외)  
 - 숨은 단서 2개 이상 포함  
 - choices에 A/B(각 6~20자)  
 - chapterNumber=1, isFinal=false  
@@ -88,60 +88,43 @@ ${logSummary || "(없음)"}
 사용자가 직전 장에서 고른 선택: ${choice}
 
 요청:
-- ${chapter + 1}장 본문 120~180자(약 150자 내외)
+- ${chapter + 1}장 본문 70~90자(약 80자 내외)
 - 반드시 "${choice}" 선택의 직접적인 결과로 이어지는 사건 전개만 작성할 것
 - 다른 선택의 내용은 절대 포함하지 말 것
 - 같은 사건으로 합치지 말고, 선택에 따라 새로운 단서/사건/분위기를 다르게 제시
 - 연속성 유지 및 단서 회수/축적
 - ${
-          chapter + 1 < 10
-            ? "choices A/B(각 6~20자), isFinal=false, finalLine는 포함하지 마세요"
-            : "결말: 엄청난 반전 + 강렬한 공포 분위기. choices=null, isFinal=true. 본문(text)은 120~180자, 마지막 소름 돋는 한마디는 text에 넣지 말고 finalLine(6~20자, 한 문장)에 따로 담으세요."
-        }
+            chapter + 1 < 10
+              ? "choices A/B(각 6~20자), isFinal=false, finalLine는 포함하지 마세요"
+              : "결말: 엄청난 반전 + 강렬한 공포 분위기. choices=null, isFinal=true. 본문(text)은 70~90자, 마지막 소름 돋는 한마디는 text에 넣지 말고 finalLine(6~20자, 한 문장)에 따로 담으세요."
+          }
 JSON만 반환
 `.trim();
 
-    // === Gemini 2.5 Flash 호출
-    const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
-    const r = await fetch(`${endpoint}?key=${encodeURIComponent(env.GEMINI_API_KEY)}`, {
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${env.OPENAI_API_KEY}` },
       body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          topP: 0.95,
-          topK: 64,
-          presencePenalty: 0.7,
-          frequencyPenalty: 0.4,
-          response_mime_type: "application/json",
-          maxOutputTokens: 800,
-        },
+        model: "gpt-4.1-mini",
+        temperature: 0.7,           // 맥락 유지 + 분기 안정성
+        presence_penalty: 0.7,      // 🔸새 단어/이미지 선호 → 반복 모티프 억제
+        frequency_penalty: 0.4,     // 🔸중복 빈도 억제
+        max_tokens: 500,
+        response_format: { type: "json_object" },
+        messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
       }),
     });
 
     if (!r.ok) {
       const t = await r.text();
-      return new Response(JSON.stringify({ error: "Gemini API error", detail: t }), {
+      return new Response(JSON.stringify({ error: "OpenAI API error", detail: t }), {
         status: 500,
-        headers: corsHeaders,
+        headers: { ...corsHeaders, "Cache-Control": "no-store" },
       });
     }
 
     const data = await r.json();
-    const content =
-      data?.candidates?.[0]?.content?.parts
-        ?.map((p: any) => (typeof p?.text === "string" ? p.text : ""))
-        .join("") ?? "";
-
-    if (!content) {
-      return new Response(JSON.stringify({ error: "Empty response from Gemini", raw: data }), {
-        status: 500,
-        headers: corsHeaders,
-      });
-    }
-
+    const content = data?.choices?.[0]?.message?.content ?? "";
     let parsed: any;
     try {
       parsed = JSON.parse(content);
@@ -150,7 +133,6 @@ JSON만 반환
       parsed = JSON.parse(cleaned);
     }
 
-    // 응답 스키마 검증
     const shapeOk =
       typeof parsed?.chapterNumber === "number" &&
       typeof parsed?.text === "string" &&
@@ -160,11 +142,11 @@ JSON만 반환
     if (!shapeOk) {
       return new Response(JSON.stringify({ error: "Invalid response shape", received: parsed }), {
         status: 500,
-        headers: corsHeaders,
+        headers: { ...corsHeaders, "Cache-Control": "no-store" },
       });
     }
 
-    // 10장 finalLine 보강 표시
+    // 10장 finalLine 강조(프론트 수정 없이도 마지막 줄 표시)
     if (parsed?.isFinal && typeof parsed?.finalLine === "string" && parsed.finalLine.trim().length > 0) {
       const line = parsed.finalLine.trim();
       parsed.text = `${parsed.text.trim()}\n\n《${line}》`;
@@ -172,12 +154,12 @@ JSON만 반환
 
     return new Response(JSON.stringify(parsed), {
       status: 200,
-      headers: { "Content-Type": "application/json; charset=utf-8", ...corsHeaders },
+      headers: { "Content-Type": "application/json; charset=utf-8", ...corsHeaders, "Cache-Control": "no-store" },
     });
   } catch (e: any) {
     return new Response(JSON.stringify({ error: String(e?.message || e) }), {
       status: 500,
-      headers: corsHeaders,
+      headers: { ...corsHeaders, "Cache-Control": "no-store" },
     });
   }
 };
