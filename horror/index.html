@@ -16,8 +16,8 @@
   <!-- 기본 설정 --> 
   <meta charset="utf-8" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" /> 
-  <title>혜숙이, 마음의 쉼터 — 공포게임</title> 
-  <meta name="description" content="상담가이자 다정한 친구 ‘혜숙이’. A/B 선택형 10챕터 공포게임을 즐겨보세요." /> 
+  <title>당신을 공포게임에 초대합니다..</title> 
+  <meta name="description" content="당신을 공포게임에 초대합니다.." /> 
   <link rel="canonical" href="https://hyesugi.com/" /> 
   <meta name="robots" content="index,follow" /> 
   <meta name="theme-color" content="#000000" /> 
@@ -31,17 +31,17 @@
   <meta property="og:type" content="website" /> 
   <meta property="og:site_name" content="hyesugi.com" /> 
   <meta property="og:url" content="https://hyesugi.com/horror" /> 
-  <meta property="og:title" content="공포게임 — 혜숙이의 이야기" /> 
-  <meta property="og:description" content="A/B 선택으로 이어지는 10챕터 공포 이야기" /> 
+  <meta property="og:title" content="당신을 공포게임에 초대합니다.." /> 
+  <meta property="og:description" content="당신을 공포게임에 초대합니다.." /> 
   <meta property="og:image" content="https://hyesugi.com/og-image.jpg" /> 
   <meta property="og:image:width" content="1200" /> 
   <meta property="og:image:height" content="630" /> 
-  <meta property="og:image:alt" content="혜숙이 공포게임 미리보기" /> 
+  <meta property="og:image:alt" content="혜숙이의 공포게임 미리보기" /> 
 
   <!-- Twitter (X) Card --> 
   <meta name="twitter:card" content="summary_large_image" /> 
-  <meta name="twitter:title" content="공포게임 — 혜숙이의 이야기" /> 
-  <meta name="twitter:description" content="A/B 선택으로 이어지는 10챕터 공포 이야기" /> 
+  <meta name="twitter:title" content="당신을 공포게임에 초대합니다..기" /> 
+  <meta name="twitter:description" content="당신을 공포게임에 초대합니다.." /> 
   <meta name="twitter:image" content="https://hyesugi.com/og-image.jpg" /> 
 
   <link rel="preload" as="image" href="https://hyesugi.com/preview.jpg" imagesrcset="https://hyesugi.com/preview.jpg" /> 
@@ -140,7 +140,7 @@ input::placeholder, textarea::placeholder {
           </button>
         </div>
 
-        <p class="text-xs opacity-70" style="color:#7a0000;">* 10장에 도달하면 A/B 버튼이 비활성화됩니다. “다른 스토리 진행”으로 새로운 이야기를 시작하세요.</p>
+        <p class="text-xs opacity-70" style="color:#7a0000;"><b>* 선택 후엔 손가락으로 천천히 다섯을 세시오..</b></p>
       </section>
     </main> 
 
@@ -269,7 +269,7 @@ input::placeholder, textarea::placeholder {
 
     async function boot() {
       setChoiceEnabled(false);
-      chapterIndicator.textContent = "로딩 중…잠시만 기..다...려...";
+      chapterIndicator.textContent = "잠시만 기..다...려... 선택 후엔 손가락으로 천천히 다섯을 세시오. ";
       storyText.textContent = "";
 
       const state = loadSession();
@@ -326,5 +326,6 @@ input::placeholder, textarea::placeholder {
   </script>
 </body> 
 </html>
+
 
 
