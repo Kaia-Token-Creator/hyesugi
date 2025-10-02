@@ -223,130 +223,154 @@
     }
   </script>
 
-  <!-- ✅ 공포게임 스크립트 (API 연동) -->
-  <script>
-    const API_ENDPOINT = "/api/horror";
+ <!-- ✅ 공포게임 스크립트 (API 연동) -->
+<script>
+  const API_ENDPOINT = "/api/horror";
 
-    const storyText = document.getElementById("story-text");
-    const chapterIndicator = document.getElementById("chapter-indicator");
-    const btnA = document.getElementById("btn-A");
-    const btnB = document.getElementById("btn-B");
-    const btnRestart = document.getElementById("btn-restart");
+  const storyText = document.getElementById("story-text");
+  const chapterIndicator = document.getElementById("chapter-indicator");
+  const btnA = document.getElementById("btn-A");
+  const btnB = document.getElementById("btn-B");
+  const btnRestart = document.getElementById("btn-restart");
 
-    function uuid() {
-      return crypto.getRandomValues(new Uint8Array(16)).reduce((a,b)=>a+b.toString(16).padStart(2,"0"),"");
-    }
-    function loadSession() {
-      let sessionId = localStorage.getItem("horrorSessionId");
-      if (!sessionId) { sessionId = uuid(); localStorage.setItem("horrorSessionId", sessionId); }
-      let log = [];
-      try { log = JSON.parse(localStorage.getItem("horrorStoryLog") || "[]"); } catch {}
-      return { sessionId, log };
-    }
-    function saveLog(log) { localStorage.setItem("horrorStoryLog", JSON.stringify(log)); }
-    function resetAll() { localStorage.removeItem("horrorStoryLog"); localStorage.setItem("horrorSessionId", uuid()); }
+  // ✅ 현재 화면에 표시된 챕터 번호를 항상 유지
+  let CURRENT_CHAPTER = 0;
 
-    function setChoiceEnabled(ok) {
-      [btnA, btnB].forEach(b => { b.disabled = !ok; b.style.opacity = ok ? "1" : "0.5"; b.style.cursor = ok ? "pointer" : "not-allowed"; });
-    }
-
-    async function requestChapter({ chapter, choice, reset=false }) {
-      const { sessionId, log } = loadSession();
-      const payload = { sessionId, chapter, choice, log, reset };
-      const r = await fetch(API_ENDPOINT, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload) });
-      if (!r.ok) throw new Error(await r.text());
-      return await r.json();
-    }
-
-    // === Typewriter: 텍스트박스와 A/B 버튼 라벨에만 적용 ===
-    const typeState = { abort:false };
-    const delay = (ms)=>new Promise(r=>setTimeout(r, ms));
-    async function typeInto(el, text, speed=18, puncExtra=3) {
-      typeState.abort = false;
-      el.textContent = "";
-      for (const ch of text) {
-        if (typeState.abort) return;
-        el.textContent += ch;
-        if ("。,，.!?…！？".includes(ch)) await delay(speed * puncExtra);
-        else await delay(speed);
-      }
-    }
-
-    async function renderChapter(data) {
-      const { chapterNumber, text, choices, isFinal } = data;
-      chapterIndicator.textContent = `Chapter ${chapterNumber}`;
-
-      // 텍스트박스에만 타자기 효과
-      setChoiceEnabled(false);
-      await typeInto(storyText, text, 18, 3);
-
-      // 버튼 라벨에만 타자기 효과
-      if (choices) {
-        await Promise.all([
-          typeInto(btnA, `A. ${choices.A}`, 12, 2),
-          typeInto(btnB, `B. ${choices.B}`, 12, 2),
-        ]);
-        setChoiceEnabled(true);
-      } else {
-        btnA.textContent = "A";
-        btnB.textContent = "B";
-        setChoiceEnabled(false);
-      }
-
-      const state = loadSession();
-      const newLog = [...state.log, { chapter: chapterNumber, text }];
-      saveLog(newLog);
-    }
-
-    async function boot() {
-  // 🚨 새로고침 시 항상 새로운 이야기로 시작
-  resetAll();  
-
-  setChoiceEnabled(false);
-  chapterIndicator.textContent = "불러오는 중…";
-  storyText.textContent = "";
-
-  try {
-    // reset을 true로 명시적으로 보냄
-    const data = await requestChapter({ chapter: 0, reset: true });
-    await renderChapter(data);
-  } catch {
-    chapterIndicator.textContent = "오류";
-    storyText.textContent = "잠시 후 다시 시도해 주세요.";
+  function uuid() {
+    return crypto.getRandomValues(new Uint8Array(16)).reduce((a,b)=>a+b.toString(16).padStart(2,"0"),"");
   }
-}
+  function loadSession() {
+    let sessionId = localStorage.getItem("horrorSessionId");
+    if (!sessionId) { sessionId = uuid(); localStorage.setItem("horrorSessionId", sessionId); }
+    let log = [];
+    try { log = JSON.parse(localStorage.getItem("horrorStoryLog") || "[]"); } catch {}
+    return { sessionId, log };
+  }
+  function saveLog(log) { localStorage.setItem("horrorStoryLog", JSON.stringify(log)); }
+  function resetAll() { localStorage.removeItem("horrorStoryLog"); localStorage.setItem("horrorSessionId", uuid()); }
 
+  function setChoiceEnabled(ok) {
+    [btnA, btnB].forEach(b => { b.disabled = !ok; b.style.opacity = ok ? "1" : "0.5"; b.style.cursor = ok ? "pointer" : "not-allowed"; });
+  }
 
-    async function onPick(p) {
-      try {
-        setChoiceEnabled(false);
-        typeState.abort = true; // 진행 중 타이핑 중단
+  async function requestChapter({ chapter, choice, reset=false }) {
+    const { sessionId, log } = loadSession();
+    const payload = { sessionId, chapter, choice, log, reset };
+    console.log("[horror] SEND", payload); // ✅ 네트워크로 나가는 실제 값 확인
+    const r = await fetch(API_ENDPOINT, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify(payload),
+    });
+    const json = await r.json().catch(()=>null);
+    if (!r.ok) {
+      console.error("[horror] ERROR", json || r.statusText);
+      throw new Error(typeof json === "object" ? JSON.stringify(json) : String(r.statusText));
+    }
+    console.log("[horror] RECV", json); // ✅ 서버 응답 확인
+    return json;
+  }
 
-        const state = loadSession();
-        const lastChapter = state.log[state.log.length - 1]?.chapter || 0;
-        if (state.log.length > 0) { state.log[state.log.length - 1].choice = p; saveLog(state.log); }
+  // === Typewriter: 텍스트박스와 A/B 버튼 라벨에만 적용 ===
+  const typeState = { abort:false };
+  const delay = (ms)=>new Promise(r=>setTimeout(r, ms));
+  async function typeInto(el, text, speed=18, puncExtra=3) {
+    typeState.abort = false;
+    el.textContent = "";
+    for (const ch of text) {
+      if (typeState.abort) return;
+      el.textContent += ch;
+      if ("。,，.!?…！？".includes(ch)) await delay(speed * puncExtra);
+      else await delay(speed);
+    }
+  }
 
-        const next = await requestChapter({ chapter: lastChapter, choice: p });
-        await renderChapter(next);
-        setChoiceEnabled(next.choices && !next.isFinal);
-      } catch {
-        alert("문제가 발생했어요. 다시 시도해 주세요.");
-        setChoiceEnabled(true);
-      }
+  async function renderChapter(data) {
+    const { chapterNumber, text, choices, isFinal } = data;
+
+    // ✅ 화면에 보이는 챕터 번호를 전역에 저장 (이 값으로 choice를 전송)
+    CURRENT_CHAPTER = Number(chapterNumber) || 0;
+
+    chapterIndicator.textContent = `Chapter ${chapterNumber}`;
+
+    // 텍스트박스에만 타자기 효과
+    setChoiceEnabled(false);
+    await typeInto(storyText, text, 18, 3);
+
+    // 버튼 라벨에만 타자기 효과
+    if (choices) {
+      await Promise.all([
+        typeInto(btnA, `A. ${choices.A}`, 12, 2),
+        typeInto(btnB, `B. ${choices.B}`, 12, 2),
+      ]);
+      setChoiceEnabled(true);
+    } else {
+      btnA.textContent = "A";
+      btnB.textContent = "B";
+      setChoiceEnabled(false);
     }
 
-    btnA.addEventListener("click", () => onPick("A"));
-    btnB.addEventListener("click", () => onPick("B"));
-    btnRestart.addEventListener("click", () => { typeState.abort = true; resetAll(); location.reload(); });
+    // 로컬 로그 갱신 (표시용)
+    const state = loadSession();
+    const newLog = [...state.log, { chapter: CURRENT_CHAPTER, text }];
+    saveLog(newLog);
+  }
 
-    // 작은 호버 효과
-    [btnA, btnB, btnRestart].forEach((el) => {
-      el.addEventListener("mouseenter", () => { el.style.background = "var(--btn-bg-hover)"; el.style.boxShadow = "0 0 0 2px var(--ring)"; });
-      el.addEventListener("mouseleave", () => { el.style.background = "var(--btn-bg)"; el.style.boxShadow = "none"; });
-    });
+  async function boot() {
+    // 🚨 새로고침 시 항상 새로운 이야기로 시작
+    resetAll();
 
-    boot();
-  </script>
+    setChoiceEnabled(false);
+    chapterIndicator.textContent = "불러오는 중…";
+    storyText.textContent = "";
+
+    try {
+      // reset을 true로 명시적으로 보냄
+      const data = await requestChapter({ chapter: 0, reset: true });
+      await renderChapter(data);
+    } catch (e) {
+      console.error(e);
+      chapterIndicator.textContent = "오류";
+      storyText.textContent = "잠시 후 다시 시도해 주세요.";
+    }
+  }
+
+  async function onPick(p) {
+    try {
+      setChoiceEnabled(false);
+      typeState.abort = true; // 진행 중 타이핑 중단
+
+      // 마지막 로그에 선택 저장(표시용)
+      const state = loadSession();
+      if (state.log.length > 0) {
+        state.log[state.log.length - 1].choice = p;
+        saveLog(state.log);
+      }
+
+      // ✅ 항상 '현재 화면의 챕터'에 대한 선택을 서버로 보냄
+      const next = await requestChapter({ chapter: CURRENT_CHAPTER, choice: p });
+      await renderChapter(next);
+      setChoiceEnabled(next.choices && !next.isFinal);
+    } catch (e) {
+      console.error(e);
+      alert("문제가 발생했어요. 다시 시도해 주세요.");
+      setChoiceEnabled(true);
+    }
+  }
+
+  btnA.addEventListener("click", () => onPick("A"));
+  btnB.addEventListener("click", () => onPick("B"));
+  btnRestart.addEventListener("click", () => { typeState.abort = true; resetAll(); location.reload(); });
+
+  // 작은 호버 효과
+  [btnA, btnB, btnRestart].forEach((el) => {
+    el.addEventListener("mouseenter", () => { el.style.background = "var(--btn-bg-hover)"; el.style.boxShadow = "0 0 0 2px var(--ring)"; });
+    el.addEventListener("mouseleave", () => { el.style.background = "var(--btn-bg)"; el.style.boxShadow = "none"; });
+  });
+
+  boot();
+</script>
+
 
   <!-- (선택) 랜덤 광고 스크립트가 있다면 그대로 유지 -->
   <script>
