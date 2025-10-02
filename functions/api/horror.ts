@@ -1,369 +1,106 @@
-// /functions/api/horror.ts
-export const onRequestPost: PagesFunction<{ OPENAI_API_KEY: string }> = async (context) => {
-  const { request, env } = context;
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 
-  const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-  };
-
-  if (request.method === "OPTIONS") {
-    return new Response(null, {
-      headers: { ...corsHeaders, "Access-Control-Allow-Methods": "POST, OPTIONS", "Cache-Control": "no-store" },
-    });
-  }
-
-  try {
-    const body = await request.json<{
-      sessionId: string;
-      chapter: number;
-      choice?: "A" | "B";
-      log?: Array<{ chapter: number; choice?: "A" | "B"; text: string; picked?: string }>;
-      reset?: boolean;
-    }>();
-
-    if (!env.OPENAI_API_KEY) {
-      return new Response(JSON.stringify({ error: "Missing OPENAI_API_KEY" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Cache-Control": "no-store" },
-      });
-    }
-
-    const { sessionId, chapter, choice, log = [], reset } = body || {};
-    if (!sessionId || (chapter === undefined || chapter === null)) {
-      return new Response(JSON.stringify({ error: "sessionId and chapter are required" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Cache-Control": "no-store" },
-      });
-    }
-
-    // 🔧 reset이면 과거 로그 완전 무시, 아니어도 최근 2장만 전달(반복 유도 줄이기)
-    const effectiveLogAll = reset ? [] : (log || []);
-    const effectiveLog = effectiveLogAll.slice(-2);
-
-    // ✅ 분기 반영 지시 강화 (기존 규칙 유지)
-    const systemPrompt = `
-당신은 한국어 공포 소설 엔진입니다.  
-사용자의 선택(A 또는 B)에 따라 반드시 다른 사건 전개가 이어지도록 작성하세요.  
-이전 로그와 마지막 선택은 반드시 반영해야 하며, 같은 전개로 합치지 마세요.  
-
-반드시 JSON 하나의 객체만 반환(코드블록 금지):
-{
-  "chapterNumber": number,
-  "text": string,                     // 각 장 120~180자(약 150자 내외)
-  "choices": { "A": string, "B": string } | null,
-  "isFinal": boolean,
-  "finalLine"?: string                // 10장에서만: 6~20자 한 문장(소름 돋는 한마디)
+// Cloudflare Worker 환경에서 Secret과 KV 네임스페이스 등의 타입을 정의합니다.
+export interface Env {
+  GEMINI_API_KEY: string;
 }
 
-규칙:
-- 1~9장은 choices 제공, 10장은 choices=null, isFinal=true
-- 각 장은 반드시 분기된 선택의 결과로 이어질 것
-- 각 장 120~180자(약 150자 내외)
-- 인물/오브젝트/시간 흐름의 일관성 유지, 단서와 떡밥은 이어져야 함
-- 과도한 고어·차별·실존인물 모욕 금지
-- 10장은 "엄청난 반전"과 "강렬한 공포 분위기"를 담고, 마지막 한마디는 finalLine에 별도로 넣기
-`.trim();
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    if (request.method !== 'POST') {
+      return new Response('잘못된 요청입니다. POST 메소드를 사용하세요.', { status: 405 });
+    }
 
-    const logSummary = (effectiveLog || [])
-      .map((l) => `#${l.chapter}${l.choice ? `(${l.choice})` : ""}: ${l.text}`.slice(0, 1200))
-      .join("\n\n");
+    try {
+      const body: {
+        sessionId: string;
+        chapter: number;
+        choice?: 'A' | 'B';
+        log: { chapter: number; text: string; choice?: 'A' | 'B' }[];
+        reset?: boolean;
+      } = await request.json();
 
-    const userPrompt =
-      reset || chapter === 0
-        ? `
-새로운 이야기의 1장을 작성.  
-- 현대 한국 배경, 오브젝트와 단서를 창의적으로 설정  
-- 본문 120~180자(약 150자 내외)  
-- 숨은 단서 2개 이상 포함  
-- choices에 A/B(각 6~20자)  
-- chapterNumber=1, isFinal=false  
-- finalLine는 포함하지 마세요(최종장 전용)  
-JSON만 반환
-`.trim()
-        : `
-지금까지의 로그:
-${logSummary || "(없음)"}
+      const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      
+      const generationConfig = {
+        temperature: 0.9,
+        topK: 1,
+        topP: 1,
+        maxOutputTokens: 2048,
+        response_mime_type: "application/json",
+      };
 
-사용자가 직전 장에서 고른 선택: ${choice}
+      const safetySettings = [
+        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+      ];
 
-요청:
-- ${chapter + 1}장 본문 120~180자(약 150자 내외)
-- 반드시 "${choice}" 선택의 직접적인 결과로 이어지는 사건 전개만 작성할 것
-- 다른 선택의 내용은 절대 포함하지 말 것
-- 같은 사건으로 합치지 말고, 선택에 따라 새로운 단서/사건/분위기를 다르게 제시
-- 연속성 유지 및 단서 회수/축적
-- ${
-            chapter + 1 < 10
-              ? "choices A/B(각 6~20자), isFinal=false, finalLine는 포함하지 마세요"
-              : "결말: 엄청난 반전 + 강렬한 공포 분위기. choices=null, isFinal=true. 본문(text)은 120~180자, 마지막 소름 돋는 한마디는 text에 넣지 말고 finalLine(6~20자, 한 문장)에 따로 담으세요."
+      // Gemini에게 역할을 부여하고 규칙을 설명하는 시스템 프롬프트
+      const systemPrompt = `
+        당신은 천재적인インタラクティブ 공포 소설가입니다. 지금부터 사용자와 함께 10개의 챕터로 구성된 하나의 완결된 공포 이야기를 만들어야 합니다.
+
+        **규칙:**
+        1.  모든 이야기는 한국어로, 궁서체로 쓰인 듯한 음침하고 문학적인 문체로 작성합니다.
+        2.  각 챕터는 약 150자 내외로, 상상력을 자극하고 극도의 긴장감을 유발해야 합니다.
+        3.  기-승-전-결이 명확한 하나의 완결된 스토리를 만들어야 합니다. 이전 챕터의 내용을 반드시 이어받아 맥락에 맞는 이야기를 전개하세요.
+        4.  마지막 10번째 챕터를 제외한 모든 챕터(1~9)의 끝에는, 이야기의 분기가 되는 두 가지 선택지 "A"와 "B"를 제시해야 합니다. 선택지는 짧고 강렬해야 합니다.
+        5.  10번째 챕터는 이야기의 결말입니다. 어떤 선택지도 제시해서는 안됩니다.
+        6.  당신의 모든 답변은 반드시 아래의 JSON 형식 중 하나를 따라야 합니다. 다른 설명은 절대 추가하지 마세요.
+
+        **JSON 출력 형식 (1~9 챕터):**
+        {
+          "text": "여기에 챕터 내용 서술...",
+          "choices": {
+            "A": "선택지 A 내용",
+            "B": "선택지 B 내용"
           }
-JSON만 반환
-`.trim();
-
-    const r = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${env.OPENAI_API_KEY}` },
-      body: JSON.stringify({
-        model: "gpt-4.1-mini",
-        temperature: 0.7,           // 맥락 유지 + 분기 안정성
-        presence_penalty: 0.7,      // 🔸새 단어/이미지 선호 → 반복 모티프 억제
-        frequency_penalty: 0.4,     // 🔸중복 빈도 억제
-        max_tokens: 500,
-        response_format: { type: "json_object" },
-        messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
-      }),
-    });
-
-    if (!r.ok) {
-      const t = await r.text();
-      return new Response(JSON.stringify({ error: "OpenAI API error", detail: t }), {
-        status: 500,
-        headers: { ...corsHeaders, "Cache-Control": "no-store" },
-      });
-    }
-
-    const data = await r.json();
-    const content = data?.choices?.[0]?.message?.content ?? "";
-    let parsed: any;
-    try {
-      parsed = JSON.parse(content);
-    } catch {
-      const cleaned = String(content).replace(/^```json|```$/g, "").trim();
-      parsed = JSON.parse(cleaned);
-    }
-
-    const shapeOk =
-      typeof parsed?.chapterNumber === "number" &&
-      typeof parsed?.text === "string" &&
-      ((parsed?.chapterNumber < 10 && parsed?.choices?.A && parsed?.choices?.B && parsed?.isFinal === false) ||
-        (parsed?.chapterNumber === 10 && parsed?.choices === null && parsed?.isFinal === true));
-
-    if (!shapeOk) {
-      return new Response(JSON.stringify({ error: "Invalid response shape", received: parsed }), {
-        status: 500,
-        headers: { ...corsHeaders, "Cache-Control": "no-store" },
-      });
-    }
-
-    // 10장 finalLine 강조(프론트 수정 없이도 마지막 줄 표시)
-    if (parsed?.isFinal && typeof parsed?.finalLine === "string" && parsed.finalLine.trim().length > 0) {
-      const line = parsed.finalLine.trim();
-      parsed.text = `${parsed.text.trim()}\n\n《${line}》`;
-    }
-
-    return new Response(JSON.stringify(parsed), {
-      status: 200,
-      headers: { "Content-Type": "application/json; charset=utf-8", ...corsHeaders, "Cache-Control": "no-store" },
-    });
-  } catch (e: any) {
-    return new Response(JSON.stringify({ error: String(e?.message || e) }), {
-      status: 500,
-      headers: { ...corsHeaders, "Cache-Control": "no-store" },
-    });
-  }
-};
-반드시 JSON 하나의 객체만 반환(코드블록 금지):
-{
-  "chapterNumber": number,
-  "text": string,                     // 각 장 120~180자(약 150자 내외)
-  "choices": { "A": string, "B": string } | null,
-  "isFinal": boolean,
-  "finalLine"?: string                // 10장에서만: 6~20자 한 문장(소름 돋는 한마디)
-}
-
-규칙:
-- 1~9장은 choices 제공, 10장은 choices=null, isFinal=true
-- 각 장은 반드시 분기된 선택의 결과로 이어질 것
-- 각 장 120~180자(약 150자 내외)
-- 인물/오브젝트/시간 흐름의 일관성 유지, 단서와 떡밥은 이어져야 함
-- 과도한 고어·차별·실존인물 모욕 금지
-- 10장은 "엄청난 반전"과 "강렬한 공포 분위기"를 담고, 마지막 한마디는 finalLine에 별도로 넣기
-`.trim();
-
-    const logSummary = (log || [])
-      .map((l) => `#${l.chapter}${l.choice ? `(${l.choice})` : ""}: ${l.text}`.slice(0, 1200))
-      .join("\n\n");
-
-    const userPrompt =
-      reset || chapter === 0
-        ? `
-새로운 이야기의 1장을 작성.  
-- 현대 한국 배경, 오브젝트와 단서를 창의적으로 설정  
-- 본문 120~180자(약 150자 내외)  
-- 숨은 단서 2개 이상 포함  
-- choices에 A/B(각 6~20자)  
-- chapterNumber=1, isFinal=false  
-- finalLine는 포함하지 마세요(최종장 전용)  
-JSON만 반환
-`.trim()
-        : `
-지금까지의 로그:
-${logSummary || "(없음)"}
-
-사용자가 직전 장에서 고른 선택: ${choice}
-
-요청:
-- ${chapter + 1}장 본문 120~180자(약 150자 내외)
-- 반드시 "${choice}" 선택의 직접적인 결과로 이어지는 사건 전개만 작성할 것
-- 다른 선택의 내용은 절대 포함하지 말 것
-- 같은 사건으로 합치지 말고, 선택에 따라 새로운 단서/사건/분위기를 다르게 제시
-- 연속성 유지 및 단서 회수/축적
-- ${
-          chapter + 1 < 10
-            ? "choices A/B(각 6~20자), isFinal=false, finalLine는 포함하지 마세요"
-            : "결말: 엄청난 반전 + 강렬한 공포 분위기. choices=null, isFinal=true. 본문(text)은 120~180자, 마지막 소름 돋는 한마디는 text에 넣지 말고 finalLine(6~20자, 한 문장)에 따로 담으세요."
         }
-JSON만 반환
-`.trim();
 
-    const r = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${env.OPENAI_API_KEY}` },
-      body: JSON.stringify({
-        model: "gpt-4.1-mini",
-        temperature: 0.7, // 맥락 유지 + 분기 안정성
-        max_tokens: 500,
-        response_format: { type: "json_object" },
-        messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
-      }),
-    });
-
-    if (!r.ok) {
-      const t = await r.text();
-      return new Response(JSON.stringify({ error: "OpenAI API error", detail: t }), { status: 500, headers: corsHeaders });
-    }
-
-    const data = await r.json();
-    const content = data?.choices?.[0]?.message?.content ?? "";
-    let parsed: any;
-    try {
-      parsed = JSON.parse(content);
-    } catch {
-      const cleaned = String(content).replace(/^```json|```$/g, "").trim();
-      parsed = JSON.parse(cleaned);
-    }
-
-    const shapeOk =
-      typeof parsed?.chapterNumber === "number" &&
-      typeof parsed?.text === "string" &&
-      ((parsed?.chapterNumber < 10 && parsed?.choices?.A && parsed?.choices?.B && parsed?.isFinal === false) ||
-        (parsed?.chapterNumber === 10 && parsed?.choices === null && parsed?.isFinal === true));
-
-    if (!shapeOk) {
-      return new Response(JSON.stringify({ error: "Invalid response shape", received: parsed }), {
-        status: 500,
-        headers: corsHeaders,
-      });
-    }
-
-    if (parsed?.isFinal && typeof parsed?.finalLine === "string" && parsed.finalLine.trim().length > 0) {
-      const line = parsed.finalLine.trim();
-      parsed.text = `${parsed.text.trim()}\n\n《${line}》`;
-    }
-
-    return new Response(JSON.stringify(parsed), {
-      status: 200,
-      headers: { "Content-Type": "application/json; charset=utf-8", ...corsHeaders },
-    });
-  } catch (e: any) {
-    return new Response(JSON.stringify({ error: String(e?.message || e) }), { status: 500, headers: corsHeaders });
-  }
-};
-- 과도한 고어·차별·실존인물 모욕 금지
-- 인물/오브젝트/시간적 흐름의 일관성 유지, 단서와 떡밥은 챕터마다 이어감
-- 반드시 선택에 따라 분기가 달라져야 함 (같은 전개 금지)
-- 10장은 "엄청난 반전"과 "강렬한 공포 분위기"를 담고, 마지막 한마디는 finalLine에 별도로 넣기
-`.trim();
-
-    const logSummary = (log || [])
-      .map((l) => `#${l.chapter}${l.choice ? `(${l.choice})` : ""}: ${l.text}`.slice(0, 1200))
-      .join("\n\n");
-
-    const userPrompt =
-      reset || chapter === 0
-        ? `
-새로운 이야기의 1장을 작성.  
-- 현대 한국 배경, 상징 오브젝트 창의적으로 1~2개 설정
-- 본문 120~180자(약 150자 내외)  
-- 숨은 단서 2개 이상  
-- choices에 A/B(각 6~20자)  
-- chapterNumber=1, isFinal=false  
-- finalLine는 포함하지 마세요(최종장 전용)  
-JSON만 반환
-`.trim()
-        : `
-지금까지의 로그:
-${logSummary || "(없음)"}
-
-사용자가 방금 선택한 선택지: ${choice}
-
-요청:
-- ${chapter + 1}장 본문 120~180자(약 150자 내외)
-- 반드시 선택지(${choice})의 결과가 반영된 분기 전개를 작성할 것
-- 같은 사건으로 합치지 말고, 선택에 따라 새로운 단서/사건/분위기를 다르게 제시
-- 연속성 유지 및 단서 회수/축적
-- ${
-          chapter + 1 < 10
-            ? "choices A/B(각 6~20자), isFinal=false, finalLine는 포함하지 마세요"
-            : "결말: 엄청난 반전 + 강렬한 공포 분위기. choices=null, isFinal=true. 본문(text)은 120~180자, 마지막 소름 돋는 한마디는 text에 넣지 말고 finalLine(6~20자, 한 문장)에 따로 담으세요."
+        **JSON 출력 형식 (10번째 챕터 - 결말):**
+        {
+          "text": "여기에 이야기의 결말 서술...",
+          "isFinal": true
         }
-JSON만 반환
-`.trim();
+      `;
 
-    const r = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${env.OPENAI_API_KEY}` },
-      body: JSON.stringify({
-        model: "gpt-4.1-mini",
-        temperature: 0.7, // 맥락 유지 + 분기 안정성
-        max_tokens: 500,
-        response_format: { type: "json_object" },
-        messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
-      }),
-    });
+      // 사용자의 이전 기록을 바탕으로 프롬프트를 구성
+      let userPrompt = "";
+      if (body.reset || body.log.length === 0) {
+        userPrompt = "이제 첫 번째 챕터를 시작하며 새로운 공포 이야기를 들려주시오.";
+      } else {
+        const history = body.log.map(entry =>
+          `[챕터 ${entry.chapter}] 내용: ${entry.text}` + (entry.choice ? `\n[선택] ${entry.choice}` : '')
+        ).join('\n\n');
+        userPrompt = `지금까지의 이야기는 다음과 같소:\n\n${history}\n\n이제 이어서 다음 챕터의 이야기를 들려주시오.`;
+      }
 
-    if (!r.ok) {
-      const t = await r.text();
-      return new Response(JSON.stringify({ error: "OpenAI API error", detail: t }), { status: 500, headers: corsHeaders });
-    }
-
-    const data = await r.json();
-    const content = data?.choices?.[0]?.message?.content ?? "";
-    let parsed: any;
-    try {
-      parsed = JSON.parse(content);
-    } catch {
-      const cleaned = String(content).replace(/^```json|```$/g, "").trim();
-      parsed = JSON.parse(cleaned);
-    }
-
-    const shapeOk =
-      typeof parsed?.chapterNumber === "number" &&
-      typeof parsed?.text === "string" &&
-      ((parsed?.chapterNumber < 10 && parsed?.choices?.A && parsed?.choices?.B && parsed?.isFinal === false) ||
-        (parsed?.chapterNumber === 10 && parsed?.choices === null && parsed?.isFinal === true));
-
-    if (!shapeOk) {
-      return new Response(JSON.stringify({ error: "Invalid response shape", received: parsed }), {
-        status: 500,
-        headers: corsHeaders,
+      const chat = model.startChat({
+        generationConfig,
+        safetySettings,
+        history: [{ role: "user", parts: [{ text: systemPrompt }] }, { role: "model", parts: [{ text: "알겠습니다. 지금부터 당신의 지시에 따라 완벽한 인터랙티브 공포 소설을 생성하겠습니다. JSON 형식 규칙을 철저히 준수하겠습니다." }] }],
       });
-    }
+      
+      const result = await chat.sendMessage(userPrompt);
+      const responseText = result.response.text();
+      
+      // Gemini가 생성한 JSON 텍스트를 파싱
+      const storyData = JSON.parse(responseText);
 
-    if (parsed?.isFinal && typeof parsed?.finalLine === "string" && parsed.finalLine.trim().length > 0) {
-      const line = parsed.finalLine.trim();
-      parsed.text = `${parsed.text.trim()}\n\n《${line}》`;
-    }
+      const finalResponse = {
+        chapterNumber: body.log.length + 1,
+        ...storyData,
+      };
 
-    return new Response(JSON.stringify(parsed), {
-      status: 200,
-      headers: { "Content-Type": "application/json; charset=utf-8", ...corsHeaders },
-    });
-  } catch (e: any) {
-    return new Response(JSON.stringify({ error: String(e?.message || e) }), { status: 500, headers: corsHeaders });
-  }
+      return new Response(JSON.stringify(finalResponse), {
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+    } catch (error) {
+      console.error('오류 발생:', error);
+      return new Response('이야기를 생성하는 데 실패했습니다. 저주가 더 강해진 모양입니다.', { status: 500 });
+    }
+  },
 };
-
-
-
