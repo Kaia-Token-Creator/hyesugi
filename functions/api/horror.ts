@@ -1,5 +1,6 @@
-// /functions/api/horror.ts
+// /functions/api/horror.ts 
 export const onRequestPost: PagesFunction<{ OPENAI_API_KEY: string }> = async (context) => {
+
   const { request, env } = context;
 
   const corsHeaders = {
@@ -28,8 +29,10 @@ export const onRequestPost: PagesFunction<{ OPENAI_API_KEY: string }> = async (c
     }
 
     // ✅ 글자수 150자 내외 + 최종장 반전/공포/마지막 한마디(finalLine) 지시 강화
+    // ✅ 일관성과 맥락 유지 강조 추가
     const systemPrompt = `
 당신은 한국어 공포 소설 엔진입니다. 이전 로그와 마지막 선택을 반영해 10장 구성의 연결된 이야기를 씁니다.
+
 반드시 JSON 하나의 객체만 반환(코드블록 금지):
 {
   "chapterNumber": number,
@@ -42,6 +45,7 @@ export const onRequestPost: PagesFunction<{ OPENAI_API_KEY: string }> = async (c
 - 1~9장은 choices 제공, 10장은 choices=null, isFinal=true
 - 각 장 120~180자(약 150자 내외), 연속성 유지, 설정 붕괴 금지
 - 과도한 고어·차별·실존인물 모욕 금지
+- 반드시 인물/오브젝트/시간적 흐름의 일관성을 유지하고, 단서와 떡밥을 챕터마다 이어가야 함
 - 10장(결말)은 "엄청난 반전"과 "강렬한 공포 분위기"를 필수로 담고,
   본문(text)은 120~180자를 지키며, 마지막 소름 돋는 한마디는 text에 넣지 말고 "finalLine" 필드로 분리해 주세요(6~20자, 한 문장).
 `.trim();
@@ -50,7 +54,6 @@ export const onRequestPost: PagesFunction<{ OPENAI_API_KEY: string }> = async (c
       .map((l) => `#${l.chapter}${l.choice ? `(${l.choice})` : ""}: ${l.text}`.slice(0, 1200))
       .join("\n\n");
 
-    // ✅ 새 이야기/다음 장 요청에서도 150자 내외와 최종장 요구사항 반영
     const userPrompt =
       reset || chapter === 0
         ? `
@@ -72,7 +75,7 @@ ${logSummary || "(없음)"}
 
 요청:
 - ${chapter + 1}장 본문 120~180자(약 150자 내외)
-- 연속성 유지 및 단서 회수/축적, 인물/오브젝트 일관성 유지
+- 연속성 유지 및 단서 회수/축적, 인물/오브젝트/시간 흐름 일관성 강화
 - ${
           chapter + 1 < 10
             ? "choices A/B(각 6~20자), isFinal=false, finalLine는 포함하지 마세요"
@@ -85,9 +88,9 @@ JSON만 반환
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${env.OPENAI_API_KEY}` },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
-        temperature: 0.9,
-        // 150자 내외라 토큰을 조금 줄여도 충분
+        // 🔽 모델을 gpt-4.1-mini로 변경
+        model: "gpt-4.1-mini",
+        temperature: 0.7, // 맥락 유지 강화를 위해 살짝 낮춤
         max_tokens: 500,
         response_format: { type: "json_object" },
         messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
@@ -109,7 +112,6 @@ JSON만 반환
       parsed = JSON.parse(cleaned);
     }
 
-    // ✅ 기본 스키마 검증(추가 필드 finalLine은 선택적이라 허용)
     const shapeOk =
       typeof parsed?.chapterNumber === "number" &&
       typeof parsed?.text === "string" &&
@@ -123,10 +125,8 @@ JSON만 반환
       });
     }
 
-    // ✅ 최종장일 때 finalLine이 있으면, 프런트가 몰라도 보이도록 text 마지막 줄에 강조해 덧붙임
     if (parsed?.isFinal && typeof parsed?.finalLine === "string" && parsed.finalLine.trim().length > 0) {
       const line = parsed.finalLine.trim();
-      // 따옴표 + 특수괄호로 간단 강조(프런트 수정 없이도 마지막 줄에 또렷하게 보임)
       parsed.text = `${parsed.text.trim()}\n\n《${line}》`;
     }
 
