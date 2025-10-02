@@ -41,7 +41,7 @@ export const onRequestPost: PagesFunction<{ GEMINI_API_KEY: string }> = async (c
     const effectiveLogAll = reset ? [] : (log || []);
     const effectiveLog = effectiveLogAll.slice(-2);
 
-    // === 시스템 프롬프트 (그대로 사용)
+    // === 시스템 프롬프트
     const systemPrompt = `
 당신은 한국어 공포 소설 엔진입니다.  
 사용자의 선택(A 또는 B)에 따라 반드시 다른 사건 전개가 이어지도록 작성하세요.  
@@ -107,16 +107,8 @@ JSON만 반환
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        // 시스템 프롬프트는 system_instruction에
         system_instruction: { parts: [{ text: systemPrompt }] },
-        // 유저 프롬프트는 contents에
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: userPrompt }],
-          },
-        ],
-        // JSON 강제 + 샘플링 설정 (OpenAI 때와 유사)
+        contents: [{ role: "user", parts: [{ text: userPrompt }] }],
         generationConfig: {
           temperature: 0.7,
           topP: 0.95,
@@ -124,7 +116,6 @@ JSON만 반환
           presencePenalty: 0.7,
           frequencyPenalty: 0.4,
           response_mime_type: "application/json",
-          // 응답 길이 충분히 확보
           maxOutputTokens: 800,
         },
       }),
