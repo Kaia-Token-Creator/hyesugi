@@ -299,22 +299,23 @@
     }
 
     async function boot() {
-      // 🚨 새로고침 시 항상 새로운 이야기로 시작
-      resetAll();  
+  // 🚨 새로고침 시 항상 새로운 이야기로 시작
+  resetAll();  
 
-      setChoiceEnabled(false);
-      chapterIndicator.textContent = "불러오는 중…";
-      storyText.textContent = "";
+  setChoiceEnabled(false);
+  chapterIndicator.textContent = "불러오는 중…";
+  storyText.textContent = "";
 
-      try {
-        // reset을 true로 명시적으로 보냄
-        const data = await requestChapter({ chapter: 0, reset: true });
-        await renderChapter(data);
-      } catch {
-        chapterIndicator.textContent = "오류";
-        storyText.textContent = "잠시 후 다시 시도해 주세요.";
-      }
-    }
+  try {
+    // reset을 true로 명시적으로 보냄
+    const data = await requestChapter({ chapter: 0, reset: true });
+    await renderChapter(data);
+  } catch {
+    chapterIndicator.textContent = "오류";
+    storyText.textContent = "잠시 후 다시 시도해 주세요.";
+  }
+}
+
 
     async function onPick(p) {
       try {
@@ -355,3 +356,4 @@
   </script>
 </body> 
 </html>
+
