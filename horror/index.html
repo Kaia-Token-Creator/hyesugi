@@ -67,18 +67,19 @@
       letter-spacing: .2px;
     }
     ::selection { background:#700; color:#fff; }
+
     /* 텍스트 입력 계열 요소를 빨간 궁서체로 */
-input, textarea, select {
-  color: var(--ink); /* 빨간색 글씨 */
-  font-family: "Gungsuh","GungSeo","Batang","Gowun Batang","Nanum Myeongjo",serif;
-  background-color: #000;   /* 검은 배경 */
-  border: 1px solid #444;   /* 경계선 어둡게 */
-  padding: 0.5rem;
-}
-input::placeholder, textarea::placeholder {
-  color: #800; /* 플레이스홀더도 붉은 느낌 */
-  font-family: "Gungsuh","GungSeo","Batang","Gowun Batang","Nanum Myeongjo",serif;
-}
+    input, textarea, select {
+      color: var(--ink); /* 빨간색 글씨 */
+      font-family: "Gungsuh","GungSeo","Batang","Gowun Batang","Nanum Myeongjo",serif;
+      background-color: #000;   /* 검은 배경 */
+      border: 1px solid #444;   /* 경계선 어둡게 */
+      padding: 0.5rem;
+    }
+    input::placeholder, textarea::placeholder {
+      color: #800; /* 플레이스홀더도 붉은 느낌 */
+      font-family: "Gungsuh","GungSeo","Batang","Gowun Batang","Nanum Myeongjo",serif;
+    }
   </style>
 </head> 
 
@@ -107,7 +108,7 @@ input::placeholder, textarea::placeholder {
     <!-- ✅ 본문: 여기만 공포게임으로 채움 -->
     <main id="content" class="flex-1 p-4"> 
       <section class="space-y-4">
-        <!-- 메시지 박스 -->
+        <!-- 메시지 박스(= 텍스트박스) -->
         <div id="story-box" class="rounded-2xl p-5 shadow-lg"
              style="background:var(--panel); border:1px solid #161616; line-height:1.85; font-size:1.05rem;">
           <div id="chapter-indicator" class="text-xs uppercase tracking-widest mb-2" style="color:#a40000;">
@@ -128,6 +129,12 @@ input::placeholder, textarea::placeholder {
           </button>
         </div>
 
+        <!-- ⬇️ 문구: A/B 버튼 바로 아래 -->
+        <p id="slow-count" class="text-center text-sm"
+           style="color:var(--ink); font-family:'Gungsuh','GungSeo','Batang','Gowun Batang',serif;">
+          <b>선택 후엔 손가락으로 천천히 다섯을 세시오</b>
+        </p>
+
         <!-- 리스타트/공유 -->
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <button id="btn-restart" class="flex-1 rounded-xl px-5 py-3 text-base border transition"
@@ -139,8 +146,6 @@ input::placeholder, textarea::placeholder {
             공포게임 공유하기
           </button>
         </div>
-
-        <p class="text-xs opacity-70" style="color:#7a0000;"><b>* 선택 후엔 손가락으로 천천히 다섯을 세시오..</b></p>
       </section>
     </main> 
 
@@ -168,7 +173,13 @@ input::placeholder, textarea::placeholder {
         <a href="https://hyesugi.com/game" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">신나는 게임</a> 
         <a href="https://hyesugi.com/tube" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">혜숙이 튜브</a> 
         <a href="https://hyesugi.com/info" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">이용 안내</a> 
-        <a href="#" id="share-btn" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">공유하기</a> 
+        <a href="#" id="share-btn" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">공유하기</a>
+        <!-- ⬇️ 마지막 항목: 빨간 궁서체 ‘공포 게임’ -->
+        <a href="https://hyesugi.com/horror"
+           class="block px-3 py-2 rounded-lg hover:bg-gray-100"
+           style="color:#e60000; font-family:'Gungsuh','GungSeo','Batang','Gowun Batang',serif;">
+          공포 게임
+        </a>
       </nav> 
     </aside> 
 
@@ -247,14 +258,34 @@ input::placeholder, textarea::placeholder {
       return await r.json();
     }
 
-    function renderChapter(data) {
+    // === Typewriter: 텍스트박스와 A/B 버튼 라벨에만 적용 ===
+    const typeState = { abort:false };
+    const delay = (ms)=>new Promise(r=>setTimeout(r, ms));
+    async function typeInto(el, text, speed=18, puncExtra=3) {
+      typeState.abort = false;
+      el.textContent = "";
+      for (const ch of text) {
+        if (typeState.abort) return;
+        el.textContent += ch;
+        if ("。,，.!?…！？".includes(ch)) await delay(speed * puncExtra);
+        else await delay(speed);
+      }
+    }
+
+    async function renderChapter(data) {
       const { chapterNumber, text, choices, isFinal } = data;
       chapterIndicator.textContent = `Chapter ${chapterNumber}`;
-      storyText.textContent = text;
 
+      // 텍스트박스에만 타자기 효과
+      setChoiceEnabled(false);
+      await typeInto(storyText, text, 18, 3);
+
+      // 버튼 라벨에만 타자기 효과
       if (choices) {
-        btnA.textContent = `A. ${choices.A}`;
-        btnB.textContent = `B. ${choices.B}`;
+        await Promise.all([
+          typeInto(btnA, `A. ${choices.A}`, 12, 2),
+          typeInto(btnB, `B. ${choices.B}`, 12, 2),
+        ]);
         setChoiceEnabled(true);
       } else {
         btnA.textContent = "A";
@@ -269,7 +300,7 @@ input::placeholder, textarea::placeholder {
 
     async function boot() {
       setChoiceEnabled(false);
-      chapterIndicator.textContent = "잠시만 기..다...려... 선택 후엔 손가락으로 천천히 다섯을 세시오. ";
+      chapterIndicator.textContent = "불러오는 중…";
       storyText.textContent = "";
 
       const state = loadSession();
@@ -278,11 +309,11 @@ input::placeholder, textarea::placeholder {
       try {
         if (last?.chapter > 0) {
           chapterIndicator.textContent = `Chapter ${last.chapter}`;
-          storyText.textContent = last.text;
+          await typeInto(storyText, last.text, 16, 3);
           setChoiceEnabled(true);
         } else {
           const data = await requestChapter({ chapter: 0, reset: true });
-          renderChapter(data);
+          await renderChapter(data);
         }
       } catch {
         chapterIndicator.textContent = "오류";
@@ -293,11 +324,14 @@ input::placeholder, textarea::placeholder {
     async function onPick(p) {
       try {
         setChoiceEnabled(false);
+        typeState.abort = true; // 진행 중 타이핑 중단
+
         const state = loadSession();
         const lastChapter = state.log[state.log.length - 1]?.chapter || 0;
         if (state.log.length > 0) { state.log[state.log.length - 1].choice = p; saveLog(state.log); }
+
         const next = await requestChapter({ chapter: lastChapter, choice: p });
-        renderChapter(next);
+        await renderChapter(next);
         setChoiceEnabled(next.choices && !next.isFinal);
       } catch {
         alert("문제가 발생했어요. 다시 시도해 주세요.");
@@ -307,7 +341,7 @@ input::placeholder, textarea::placeholder {
 
     btnA.addEventListener("click", () => onPick("A"));
     btnB.addEventListener("click", () => onPick("B"));
-    btnRestart.addEventListener("click", () => { resetAll(); location.reload(); });
+    btnRestart.addEventListener("click", () => { typeState.abort = true; resetAll(); location.reload(); });
 
     // 작은 호버 효과
     [btnA, btnB, btnRestart].forEach((el) => {
@@ -326,6 +360,3 @@ input::placeholder, textarea::placeholder {
   </script>
 </body> 
 </html>
-
-
-
