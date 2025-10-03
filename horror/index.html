@@ -9,7 +9,7 @@
       gtag('config', 'G-QR5TWB3RYJ');
     </script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9891583086388017"
-         crossorigin="anonymous"></script>
+          crossorigin="anonymous"></script>
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -81,7 +81,7 @@
         </header>
 
         <main id="content" class="flex-1 p-4 flex flex-col items-center justify-center space-y-6">
-            <div id="story-box" class="w-full h-48 p-4 border-2 border-red-700 rounded-lg text-lg leading-relaxed horror-font text-center flex items-center justify-center">
+            <div id="story-box" class="w-full min-h-[12rem] p-4 border-2 border-red-700 rounded-lg text-lg leading-relaxed horror-font text-left overflow-y-auto">
                 잠깐 기다..려... 손가락으로 천천히 다섯을 세시오
             </div>
             
@@ -91,15 +91,15 @@
             </div>
             
             <div class="text-center space-y-4 pt-4">
-                 <p class="horror-font text-sm text-red-700">손가락으로 천천히 다섯을 세시오</p>
-                 <div class="flex gap-4">
-                    <button id="new-story-btn" class="px-4 py-2 horror-font bg-gray-900 border border-red-700 rounded hover:bg-red-900/80 transition-colors">
-                        다른 스토리 진행
-                    </button>
-                    <button id="share-game-btn" class="px-4 py-2 horror-font bg-gray-900 border border-red-700 rounded hover:bg-red-900/80 transition-colors">
-                        공포게임 공유하기
-                    </button>
-                 </div>
+                    <p class="horror-font text-sm text-red-700">손가락으로 천천히 다섯을 세시오</p>
+                    <div class="flex gap-4">
+                        <button id="new-story-btn" class="px-4 py-2 horror-font bg-gray-900 border border-red-700 rounded hover:bg-red-900/80 transition-colors">
+                            다른 스토리 진행
+                        </button>
+                        <button id="share-game-btn" class="px-4 py-2 horror-font bg-gray-900 border border-red-700 rounded hover:bg-red-900/80 transition-colors">
+                            공포게임 공유하기
+                        </button>
+                    </div>
             </div>
         </main>
     </div>
@@ -186,11 +186,11 @@
 
         // === Footer Ad (기존 유지) ===
         const ads = [
-           { text: "인터넷 바꾸면 47만원 지급해드려요!", url: "https://iryan.kr/t73750ushf" },
-           { text: "1시간 투자, 월평균 148만원 버는 고효율 부업", url: "https://iryan.kr/t738hkv2k0" },
-           { text: "넷플릭스 글로벌 컨텐츠 잠금해제하는 방법", url: "https://hyesugi.com/vpn" },
-           { text: "인간으로 살아남기", url: "https://hyesugi.com/world" },
-           { text: "노트북, 데스크탑, 아이패드, 태블릿 초특가 구매", url: "https://hyesugi.com/refur" }
+            { text: "인터넷 바꾸면 47만원 지급해드려요!", url: "https://iryan.kr/t73750ushf" },
+            { text: "1시간 투자, 월평균 148만원 버는 고효율 부업", url: "https://iryan.kr/t738hkv2k0" },
+            { text: "넷플릭스 글로벌 컨텐츠 잠금해제하는 방법", url: "https://hyesugi.com/vpn" },
+            { text: "인간으로 살아남기", url: "https://hyesugi.com/world" },
+            { text: "노트북, 데스크탑, 아이패드, 태블릿 초특가 구매", url: "https://hyesugi.com/refur" }
         ];
         const pick = ads[Math.floor(Math.random() * ads.length)];
         const slot = document.getElementById("ad-slot");
@@ -214,18 +214,47 @@
         let storyHistory = [];
         const loadingMessage = '잠깐 기다..려... 손가락으로 천천히 다섯을 세시오';
 
-        // 타자기 효과 함수
-        function typeWriter(element, text, speed = 50) {
-            element.innerHTML = "";
+        // 1. 타자기 효과 함수 수정 (HTML 태그 처리 가능하도록)
+        function typeWriter(element, htmlContent, speed = 50) {
+            element.innerHTML = ""; // 기존 내용 비우기
             element.classList.add('typing');
-            let i = 0;
+
+            // 임시 div를 사용하여 HTML 내용을 파싱
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            const nodes = Array.from(tempDiv.childNodes); // 노드 리스트를 배열로 변환
+
+            let nodeIndex = 0;
+            let charIndex = 0;
+
             function type() {
-                if (i < text.length) {
-                    element.innerHTML += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
+                if (nodeIndex < nodes.length) {
+                    const currentNode = nodes[nodeIndex];
+
+                    if (currentNode.nodeType === Node.TEXT_NODE) { // 텍스트 노드
+                        const text = currentNode.textContent;
+                        if (charIndex < text.length) {
+                            element.innerHTML += text.charAt(charIndex);
+                            charIndex++;
+                            setTimeout(type, speed);
+                        } else {
+                            // 현재 텍스트 노드 완료, 다음 노드로 이동
+                            nodeIndex++;
+                            charIndex = 0;
+                            setTimeout(type, speed);
+                        }
+                    } else if (currentNode.nodeType === Node.ELEMENT_NODE) { // HTML 요소 노드 (예: <strong>, <br>)
+                        element.appendChild(currentNode.cloneNode(true)); // 요소 통째로 추가
+                        nodeIndex++;
+                        charIndex = 0; // 다음 노드로 이동
+                        setTimeout(type, speed);
+                    } else { // 기타 노드 (주석 등)
+                        nodeIndex++;
+                        charIndex = 0;
+                        setTimeout(type, speed);
+                    }
                 } else {
-                    element.classList.remove('typing');
+                    element.classList.remove('typing'); // 모든 내용 출력 완료
                 }
             }
             type();
@@ -240,7 +269,7 @@
         // 스토리 진행 함수
         async function proceedStory(choice = null) {
             setButtonsDisabled(true);
-            storyBox.innerHTML = loadingMessage;
+            storyBox.innerHTML = `<span class="typing">${loadingMessage}</span>`; // 로딩 메시지도 타자기 효과
             
             if (choice) {
                 storyHistory.push({ role: 'user', parts: [{ text: `선택: ${choice}` }] });
@@ -259,18 +288,21 @@
 
                 const data = await response.json();
                 
-                storyHistory.push({ role: 'model', parts: [{ text: JSON.stringify(data) }] });
+                // JSON.parse를 한 번 더 거치지 않도록 수정
+                const modelResponseData = data; 
+                storyHistory.push({ role: 'model', parts: [{ text: JSON.stringify(modelResponseData) }] });
 
-                let fullStoryText = data.story;
-                if (data.chapter === 10 && data.finalSentence) {
-                    fullStoryText += `<br><br><strong class="text-xl text-red-400">${data.finalSentence}</strong>`;
+
+                let fullStoryText = modelResponseData.story;
+                if (modelResponseData.chapter === 10 && modelResponseData.finalSentence) {
+                    fullStoryText += `<br><br><strong class="text-xl text-red-400">${modelResponseData.finalSentence}</strong>`;
                 }
 
                 typeWriter(storyBox, fullStoryText);
 
-                if (data.chapter < 10) {
-                    btnA.textContent = data.choiceA;
-                    btnB.textContent = data.choiceB;
+                if (modelResponseData.chapter < 10) {
+                    btnA.textContent = modelResponseData.choiceA;
+                    btnB.textContent = modelResponseData.choiceB;
                     setButtonsDisabled(false);
                 } else {
                     btnA.textContent = '...';
@@ -280,7 +312,7 @@
 
             } catch (error) {
                 console.error("Error fetching story:", error);
-                storyBox.textContent = "이야기를 불러오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.";
+                storyBox.innerHTML = `<span class="horror-font text-red-500">이야기를 불러오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.</span>`;
             }
         }
         
@@ -318,4 +350,3 @@
     </script>
 </body>
 </html>
-
