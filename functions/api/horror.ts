@@ -60,8 +60,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       { role: 'user', parts: [{ text: '이제 이 기록을 바탕으로 다음 챕터를 JSON 형식으로 생성해줘. 기록이 비어있다면 챕터 1을 생성하면 된다.' }] },
     ];
     
-    // ### 모델 이름을 최신 버전인 gemini-2.5-pro 로 변경했습니다! ###
-    const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`;
+    // ### 모델 이름을 비용 효율적인 gemini-2.5-flash 로 변경했습니다! ###
+    const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     const geminiResponse = await fetch(geminiApiUrl, {
       method: 'POST',
