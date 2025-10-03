@@ -1,165 +1,116 @@
-// /functions/api/horror.ts
-export const onRequestPost: PagesFunction<{ OPENAI_API_KEY: string }> = async (context) => {
-  const { request, env } = context;
-
-  const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-  };
-
-  if (request.method === "OPTIONS") {
-    return new Response(null, {
-      headers: { ...corsHeaders, "Access-Control-Allow-Methods": "POST, OPTIONS", "Cache-Control": "no-store" },
-    });
-  }
-
-  try {
-    const body = await request.json<{
-      sessionId: string;
-      chapter: number;
-      choice?: "A" | "B";
-      log?: Array<{ chapter: number; choice?: "A" | "B"; text: string; picked?: string }>;
-      reset?: boolean;
-    }>();
-
-    if (!env.OPENAI_API_KEY) {
-      return new Response(JSON.stringify({ error: "Missing OPENAI_API_KEY" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Cache-Control": "no-store" },
-      });
-    }
-
-    const { sessionId, chapter, choice, log = [], reset } = body || {};
-    if (!sessionId || (chapter === undefined || chapter === null)) {
-      return new Response(JSON.stringify({ error: "sessionId and chapter are required" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Cache-Control": "no-store" },
-      });
-    }
-
-    // 🔧 reset이면 과거 로그 완전 무시, 아니어도 최근 2장만 전달(반복 모티프 억제)
-    const effectiveLogAll = reset ? [] : (log || []);
-    const effectiveLog = effectiveLogAll.slice(-2);
-
-    // ✅ 분기 반영 지시 강화 (길이만 70~90자로 축소)
-    const systemPrompt = `
-당신은 한국어 천재 공포 소설가입니다.  
-사용자의 선택(A 또는 B)에 따라 반드시 다른 사건 전개가 이어지도록 작성하세요.  
-이전 로그와 마지막 선택은 반드시 반영해야 하며, 같은 전개로 합치지 마세요.  
-
-반드시 JSON 하나의 객체만 반환(코드블록 금지):
-{
-  "chapterNumber": number,
-  "text": string,                     // 각 장 70~90자(약 80자 내외)
-  "choices": { "A": string, "B": string } | null,
-  "isFinal": boolean,
-  "finalLine"?: string                // 10장에서만: 6~20자 한 문장(소름 돋는 한마디)
+// Define the structure for the API key environment variable
+interface Env {
+  GEMINI_API_KEY: string;
 }
 
-규칙:
-- 1~9장은 choices 제공, 10장은 choices=null, isFinal=true
-- 각 장은 반드시 분기된 선택의 결과로 이어질 것
-- 각 장 70~90자(약 80자 내외)
-- 인물/오브젝트/시간 흐름의 일관성 유지, 단서와 떡밥은 이어져야 함
-- 과도한 고어·차별·실존인물 모욕 금지
-- 10장은 "엄청난 반전"과 "강렬한 공포 분위기"를 담고, 마지막 한마디는 finalLine에 별도로 넣기
-`.trim();
+// Define the expected JSON structure from the Gemini API
+interface StoryChapter {
+  chapter: number;
+  story: string;
+  choiceA?: string;
+  choiceB?: string;
+  finalSentence?: string;
+}
 
-    const logSummary = (effectiveLog || [])
-      .map((l) => `#${l.chapter}${l.choice ? `(${l.choice})` : ""}: ${l.text}`.slice(0, 1200))
-      .join("\n\n");
+// Main handler for the Cloudflare Worker
+export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
+  try {
+    const { storyHistory } = await request.json<any>();
+    const apiKey = env.GEMINI_API_KEY;
 
-    const userPrompt =
-      reset || chapter === 0
-        ? `
-새로운 이야기의 1장을 작성.  
-- 현대 한국 배경, 오브젝트와 단서를 창의적으로 설정  
-- 본문 70~90자(약 80자 내외)  
-- 숨은 단서 2개 이상 포함  
-- choices에 A/B(각 6~20자)  
-- chapterNumber=1, isFinal=false  
-- finalLine는 포함하지 마세요(최종장 전용)  
-JSON만 반환
-`.trim()
-        : `
-지금까지의 로그:
-${logSummary || "(없음)"}
+    if (!apiKey) {
+      return new Response(JSON.stringify({ error: 'API key not configured' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
-사용자가 직전 장에서 고른 선택: ${choice}
+    const systemPrompt = `
+      너는 천재적인 공포 소설 작가다. 사용자와 상호작용하며 짧은 10챕터짜리 공포 게임을 만드는 임무를 맡았다.
 
-요청:
-- ${chapter + 1}장 본문 70~90자(약 80자 내외)
-- 반드시 "${choice}" 선택의 직접적인 결과로 이어지는 사건 전개만 작성할 것
-- 다른 선택의 내용은 절대 포함하지 말 것
-- 같은 사건으로 합치지 말고, 선택에 따라 새로운 단서/사건/분위기를 다르게 제시
-- 연속성 유지 및 단서 회수/축적
-- ${
-            chapter + 1 < 10
-              ? "choices A/B(각 6~20자), isFinal=false, finalLine는 포함하지 마세요"
-              : "결말: 엄청난 반전 + 강렬한 공포 분위기. choices=null, isFinal=true. 본문(text)은 70~90자, 마지막 소름 돋는 한마디는 text에 넣지 말고 finalLine(6~20자, 한 문장)에 따로 담으세요."
-          }
-JSON만 반환
-`.trim();
+      **규칙:**
+      1.  전체 이야기는 반드시 10개의 챕터로 완결된다.
+      2.  각 챕터는 한국어 150자 내외로, 상상력을 자극하는 문학적인 묘사를 사용해야 한다.
+      3.  기승전결이 뚜렷해야 하며, 챕터가 진행될수록 긴장감이 고조되어야 한다.
+      4.  사용자의 선택에 따라 다음 이야기가 유기적으로 연결되어야 한다. 선택의 결과를 명확히 반영해라.
+      5.  챕터 10은 모든 것의 결말이며, 선택지 없이 소름 돋는 마지막 한 문장으로 끝내야 한다.
+      6.  매번 새로운 사용자가 들어오면, 완전히 새로운 주제의 공포 이야기를 시작해야 한다. (예: 폐가, 저주받은 인형, 귀신 들린 학교, 미지의 존재 등)
+      
+      **출력 형식 (매우 중요):**
+      - 반드시 아래의 JSON 형식 중 하나로만 응답해야 한다. 다른 설명이나 텍스트는 절대 추가하지 마라.
+      - 챕터 1-9 형식:
+        {
+          "chapter": [현재 챕터 번호(숫자)],
+          "story": "[이번 챕터 이야기]",
+          "choiceA": "[선택지 A 텍스트]",
+          "choiceB": "[선택지 B 텍스트]"
+        }
+      - 챕터 10 (마지막) 형식:
+        {
+          "chapter": 10,
+          "story": "[마지막 챕터 이야기]",
+          "finalSentence": "[소름 돋는 마지막 한 문장]"
+        }
+    `;
 
-    const r = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${env.OPENAI_API_KEY}` },
-      body: JSON.stringify({
-        model: "gpt-4.1-mini",
-        temperature: 0.7,           // 맥락 유지 + 분기 안정성
-        presence_penalty: 0.7,      // 🔸새 단어/이미지 선호 → 반복 모티프 억제
-        frequency_penalty: 0.4,     // 🔸중복 빈도 억제
-        max_tokens: 500,
-        response_format: { type: "json_object" },
-        messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
+    // Construct the prompt history for the Gemini API
+    const contents = [
+      {
+        role: 'user',
+        parts: [{ text: systemPrompt }],
+      },
+      {
+        role: 'model',
+        parts: [{ text: "알겠습니다. 규칙을 숙지했으며, 요청에 따라 짜임새 있는 10챕터 공포 이야기를 JSON 형식으로 생성하겠습니다." }],
+      },
+      // Add existing story history if it exists
+      ...(Array.isArray(storyHistory) ? storyHistory : []),
+      // Add the final instruction to generate the next part
+      {
+        role: 'user',
+        parts: [{ text: '이제 이 기록을 바탕으로 다음 챕터를 JSON 형식으로 생성해줘. 기록이 비어있다면 챕터 1을 생성하면 된다.' }],
+      },
+    ];
+
+    const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest?key=${apiKey}`;
+
+    const geminiResponse = await fetch(geminiApiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        contents,
+        generationConfig: {
+            // Ensure the output is valid JSON
+            responseMimeType: "application/json",
+            temperature: 1.0, // Higher temperature for more creative/varied stories
+            topP: 0.95,
+            topK: 40,
+        }
       }),
     });
 
-    if (!r.ok) {
-      const t = await r.text();
-      return new Response(JSON.stringify({ error: "OpenAI API error", detail: t }), {
-        status: 500,
-        headers: { ...corsHeaders, "Cache-Control": "no-store" },
-      });
+    if (!geminiResponse.ok) {
+      const errorText = await geminiResponse.text();
+      console.error("Gemini API Error:", errorText);
+      throw new Error(`Gemini API request failed with status ${geminiResponse.status}`);
     }
 
-    const data = await r.json();
-    const content = data?.choices?.[0]?.message?.content ?? "";
-    let parsed: any;
-    try {
-      parsed = JSON.parse(content);
-    } catch {
-      const cleaned = String(content).replace(/^```json|```$/g, "").trim();
-      parsed = JSON.parse(cleaned);
-    }
+    const responseData = await geminiResponse.json();
+    const modelResponseText = responseData.candidates[0].content.parts[0].text;
+    
+    // The response is already JSON because of responseMimeType
+    const storyData: StoryChapter = JSON.parse(modelResponseText);
 
-    const shapeOk =
-      typeof parsed?.chapterNumber === "number" &&
-      typeof parsed?.text === "string" &&
-      ((parsed?.chapterNumber < 10 && parsed?.choices?.A && parsed?.choices?.B && parsed?.isFinal === false) ||
-        (parsed?.chapterNumber === 10 && parsed?.choices === null && parsed?.isFinal === true));
-
-    if (!shapeOk) {
-      return new Response(JSON.stringify({ error: "Invalid response shape", received: parsed }), {
-        status: 500,
-        headers: { ...corsHeaders, "Cache-Control": "no-store" },
-      });
-    }
-
-    // 10장 finalLine 강조(프론트 수정 없이도 마지막 줄 표시)
-    if (parsed?.isFinal && typeof parsed?.finalLine === "string" && parsed.finalLine.trim().length > 0) {
-      const line = parsed.finalLine.trim();
-      parsed.text = `${parsed.text.trim()}\n\n《${line}》`;
-    }
-
-    return new Response(JSON.stringify(parsed), {
+    return new Response(JSON.stringify(storyData), {
       status: 200,
-      headers: { "Content-Type": "application/json; charset=utf-8", ...corsHeaders, "Cache-Control": "no-store" },
+      headers: { 'Content-Type': 'application/json' },
     });
-  } catch (e: any) {
-    return new Response(JSON.stringify({ error: String(e?.message || e) }), {
+
+  } catch (error) {
+    console.error(error);
+    return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { ...corsHeaders, "Cache-Control": "no-store" },
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 };
