@@ -53,26 +53,15 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         }
     `;
 
-    // Construct the prompt history for the Gemini API
     const contents = [
-      {
-        role: 'user',
-        parts: [{ text: systemPrompt }],
-      },
-      {
-        role: 'model',
-        parts: [{ text: "알겠습니다. 규칙을 숙지했으며, 요청에 따라 짜임새 있는 10챕터 공포 이야기를 JSON 형식으로 생성하겠습니다." }],
-      },
-      // Add existing story history if it exists
+      { role: 'user', parts: [{ text: systemPrompt }] },
+      { role: 'model', parts: [{ text: "알겠습니다. 규칙을 숙지했으며, 요청에 따라 짜임새 있는 10챕터 공포 이야기를 JSON 형식으로 생성하겠습니다." }] },
       ...(Array.isArray(storyHistory) ? storyHistory : []),
-      // Add the final instruction to generate the next part
-      {
-        role: 'user',
-        parts: [{ text: '이제 이 기록을 바탕으로 다음 챕터를 JSON 형식으로 생성해줘. 기록이 비어있다면 챕터 1을 생성하면 된다.' }],
-      },
+      { role: 'user', parts: [{ text: '이제 이 기록을 바탕으로 다음 챕터를 JSON 형식으로 생성해줘. 기록이 비어있다면 챕터 1을 생성하면 된다.' }] },
     ];
-
-    const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest?key=${apiKey}`;
+    
+    // ### 이 부분이 수정되었습니다! ###
+    const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
     const geminiResponse = await fetch(geminiApiUrl, {
       method: 'POST',
@@ -80,9 +69,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       body: JSON.stringify({ 
         contents,
         generationConfig: {
-            // Ensure the output is valid JSON
             responseMimeType: "application/json",
-            temperature: 1.0, // Higher temperature for more creative/varied stories
+            temperature: 1.0,
             topP: 0.95,
             topK: 40,
         }
@@ -98,7 +86,6 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     const responseData = await geminiResponse.json();
     const modelResponseText = responseData.candidates[0].content.parts[0].text;
     
-    // The response is already JSON because of responseMimeType
     const storyData: StoryChapter = JSON.parse(modelResponseText);
 
     return new Response(JSON.stringify(storyData), {
