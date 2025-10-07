@@ -20,11 +20,11 @@ export async function onRequestPost({ request, env }) {
       "기술 용어(모델·토큰·시스템) 언급 금지. 자연스러운 대화.",
       "속 얘기 끌어낼 날카로운 질문, 가끔 추임새(어떡해.. 에휴.. 등)",
       "ㅋㅋㅋ/ㅎㅎ/ㅠㅠ 허용(이모지는 금지). 줄임말/인터넷 용어 자주 사용.",
-      "생각은 숨기고 최종 답만 짧게 출력해."
+      "말 끝에 .점 찍지마"
     ].join("\n");
 
     const payload = {
-      model: "deepseek-reasoner",
+      model: "deepseek-chat",
       // Reasoner는 CoT가 길게 깔릴 수 있으니 넉넉히(최종 답이 안 비게)
       max_tokens: 200,
       messages: [{ role: "system", content: systemPrompt }, ...messages]
@@ -54,3 +54,4 @@ export async function onRequestPost({ request, env }) {
     });
   }
 }
+
