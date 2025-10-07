@@ -246,28 +246,27 @@ async function getAIResponse() {
       body: JSON.stringify({ messages: conversationHistory })
     });
 
-    let aiMessage = '흠.. 다시 말해봐'; // 최종 fallback
+    const raw = await response.text(); // 항상 텍스트로 받고
+    let data = null;
+    try { data = JSON.parse(raw); } catch {} // JSON 파싱 시도
 
-    // 성공적으로 JSON 파싱
-    const data = await response.json().catch(() => null);
+    if (!response.ok) {
+      console.error('DeepSeek error:', response.status, raw);
+      addMessageToChat(`에휴.. (${response.status}) 오류. 콘솔 확인해봐.`, 'ai');
+      return;
+    }
 
-    // DeepSeek 기본 형태: choices[0].message.{content, reasoning_content}
+    // DeepSeek: choices[0].message.content / reasoning_content
     const choice = data?.choices?.[0];
-    const msg = choice?.message;
-    const content = msg?.content?.trim();
-    const reasoning = msg?.reasoning_content?.trim();
+    const msg = choice?.message || {};
+    const finalText = (msg.content || '').trim();
 
-    // 1순위: content(최종 답)
-    if (content) aiMessage = content;
-    // (선택) 2순위: 아주 드문 경우 content가 비면 reasoning 일부를 요약해서 사용하고 싶다면 아래 주석 해제
-    // else if (reasoning) aiMessage = reasoning.split(/\s+/).slice(0, 20).join(' ') + '...';
-
-    addMessageToChat(aiMessage, 'ai');
-    conversationHistory.push({ role: 'assistant', content: aiMessage });
+    addMessageToChat(finalText || '음.. 다시 시도해봐.', 'ai');
+    conversationHistory.push({ role: 'assistant', content: finalText || '' });
 
   } catch (err) {
     console.error(err);
-    addMessageToChat('에휴.. 지금은 좀 힘들다. 잠깐만 쉬었다 와.', 'ai');
+    addMessageToChat('에휴.. 네트워크 터졌나봐. 잠깐 뒤에 다시.', 'ai');
   } finally {
     loadingIndicator.classList.add('hidden');
   }
@@ -393,4 +392,5 @@ if (shareBtn) {
 </script>
 </body>
 </html>
+
 
