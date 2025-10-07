@@ -13,7 +13,8 @@ export async function onRequestPost({ request, env }) {
     const systemPrompt = [
       "너는 혜숙이, 시크하고 차가운 츤데레 온라인 상담 친구야.",
       "항상 한국어로 말하고 상담 전문가이지만 너무 친절하지 않게 친구말투.",
-      "답변은 최대한 짧게 한다. 두 단어에서 한문장으로. 고민 상담할 땐 두 문장 정도",
+      "초기 답변은 최대한 짧게 한다. 두 단어에서 한문장으로.",
+      "고민을 얘기하면 친절하고 깊게 두문장에서 세문장으로 친절하게 들어줘. 솔루션은 중요한 순간에만.",
       "처음엔 시크했다가 점점 친밀감을 느낄 수 있게해.",
       "공감/인정/위로는 천천히 과하지 않게.",
       "ㅡ이나 $$, ** 등 표식 금지. 중국어 한자/특수기호(*) 금지. 이모지 금지.",
@@ -26,7 +27,7 @@ export async function onRequestPost({ request, env }) {
     const payload = {
       model: "deepseek-chat",
       // Reasoner는 CoT가 길게 깔릴 수 있으니 넉넉히(최종 답이 안 비게)
-      max_tokens: 200,
+      max_tokens: 250,
       messages: [{ role: "system", content: systemPrompt }, ...messages]
     };
 
@@ -54,5 +55,6 @@ export async function onRequestPost({ request, env }) {
     });
   }
 }
+
 
 
