@@ -178,6 +178,66 @@
   </nav>
 </aside>
 
+  <script>
+// === Drawer (햄버거 메뉴) 토글 ===
+(function () {
+  const drawer = document.getElementById('drawer');
+  const overlay = document.getElementById('drawer-overlay');
+  const menuBtn = document.getElementById('menu-btn');
+  const closeBtn = document.getElementById('drawer-close');
+
+  const openDrawer = () => {
+    drawer.classList.remove('translate-x-full');
+    overlay.classList.remove('hidden');
+  };
+  const closeDrawer = () => {
+    drawer.classList.add('translate-x-full');
+    overlay.classList.add('hidden');
+  };
+
+  menuBtn?.addEventListener('click', openDrawer);
+  closeBtn?.addEventListener('click', closeDrawer);
+  overlay?.addEventListener('click', closeDrawer);
+
+  // ESC로 닫기
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeDrawer();
+  });
+
+  // 드로어 안의 링크 클릭 시 자동 닫기
+  document.querySelectorAll('#drawer a').forEach((a) => {
+    a.addEventListener('click', closeDrawer);
+  });
+
+  // 공유하기 버튼
+  const shareBtn = document.getElementById('share-btn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const shareData = {
+        title: document.title || 'hyesugi.com',
+        url: location.href
+      };
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+        } else {
+          await navigator.clipboard.writeText(shareData.url);
+          const orig = shareBtn.textContent;
+          shareBtn.textContent = '링크 복사됨!';
+          setTimeout(() => (shareBtn.textContent = orig || '공유하기'), 1500);
+        }
+      } catch (_) {
+        // 사용자가 공유 취소한 경우 등은 무시
+      } finally {
+        closeDrawer();
+      }
+    });
+  }
+})();
+</script>
+
+
 <script>
 // === 추가: AI 답변 내 링크 자동 변환 유틸 ===
 function safeLinkify(text) {
@@ -314,3 +374,4 @@ userInput.addEventListener('keydown', (e) => {
 </script>
 </body>
 </html>
+
