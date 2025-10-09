@@ -7,7 +7,6 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-QR5TWB3RYJ');
 </script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9891583086388017"
@@ -29,7 +28,7 @@
 <link rel="apple-touch-icon" href="https://hyesugi.com/apple-touch-icon.png" sizes="180x180" />
 <link rel="manifest" href="https://hyesugi.com/site.webmanifest" />
 
-<!-- Open Graph (Facebook, Kakao, Slack 등) -->
+<!-- Open Graph -->
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="hyesugi.com" />
 <meta property="og:url" content="https://hyesugi.com/" />
@@ -58,17 +57,15 @@
 :root { --anchorH: 80px; --kb: 0px; --kbGap: 0px; } /* kbGap = 키보드 위 여백 */
 
 #app{
-  /* 키보드 높이 제거: 앵커 + 세이프영역만 */
   padding-bottom: calc(var(--anchorH) + env(safe-area-inset-bottom));
 }
 #chat-footer{
   position: sticky;
-  /* 키보드가 없으면 anchorH, 있으면 kb + kbGap 을 사용 */
   bottom: calc(max(var(--anchorH), calc(var(--kb) + var(--kbGap))) + env(safe-area-inset-bottom));
   z-index: 30;
 }
 
-/* === 아바타 추가 (UI/UX 유지, 메시지에만 아바타 표시) === */
+/* === 아바타 === */
 .msg-row { display: flex; gap: 8px; }
 .msg-row.ai { justify-content: flex-start; }
 .msg-row.user { justify-content: flex-end; }
@@ -88,7 +85,7 @@
   color: #000;
   font-weight: 700;
   font-size: 14px;
-  line-height: 36px; /* 텍스트 수직 정렬 */
+  line-height: 36px;
   text-align: center;
   user-select: none;
 }
@@ -96,7 +93,7 @@
 .bubble {
   border-radius: 0.5rem;
   padding: 0.75rem;
-  max-width: 20rem; /* md:max-w-md와 비슷한 효과를 base에 부여 */
+  max-width: 20rem;
   box-shadow: 0 1px 2px rgba(0,0,0,0.08);
 }
 @media (min-width: 768px){
@@ -104,8 +101,6 @@
 }
 .bubble-ai { background: #fff; color: #1f2937; }
 .bubble-user { background: #FFCD50; color: #1f2937; }
-
-/* 초기 웰컴 메시지 영역에도 동일 스타일을 쓰기 위해 */
 </style>
 </head>
 <body class="bg-white font-sans">
@@ -131,7 +126,7 @@
 
 <!-- Chat Container -->
 <div id="chat-container" class="flex-1 p-4 overflow-y-auto space-y-4">
-  <!-- 초기 AI 웰컴 메시지 (아바타 포함) -->
+  <!-- 초기 AI 웰컴 메시지 -->
   <div class="msg-row ai">
     <div class="avatar" aria-hidden="true">
       <img src="https://hyesugi.com/hyesugi.jpg" alt="혜숙이 프로필">
@@ -184,6 +179,8 @@
     <a href="solo" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">솔로는 여기</a>
     <a href="money" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">돈되는 정보</a>
     <a href="game" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">신나는 게임</a>
+    <a href="https://hyesugi.com/tube" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">혜숙이 튜브</a>
+    <a href="https://hyesugi.com/horror" class="block px-3 py-2 rounded-lg hover:bg-gray-100" style="font-family: 'Gungsuh', '궁서', serif; color: red;">공포 게임</a>
     <a href="info" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">이용 안내</a>
     <a href="#" id="share-btn" class="block px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-800">공유하기</a>
   </nav>
@@ -195,36 +192,11 @@ const userInput = document.getElementById('user-input');
 const sendButton = document.getElementById('send-button');
 const loadingIndicator = document.getElementById('loading');
 
-// 대화 기록 저장
+// 대화 기록
 let conversationHistory = [];
 
-// 시스템 메시지
-const systemMessage = {
-    role: 'system',
-    content: [
-    "너는 '혜숙이' — 상담 친구야 츤데레이지만 따뜻해.",
-  "목표: 사용자의 감정을 공감하고 위로하며, 부담 없는 실용적 제안을 1~2개만 건네기.",
-  "항상 한국어로 답하고, 너무 친절하지는 않게 친구 말투를 유지해.",
-  "사용자의 말투·길이를 미러링해서 답변 길이와 표현 수위를 맞춰줘.",
-  "과하지 않게 공감/인정을 해줘.",
-    "그 다음은 작은 제안 1~2개만, 과한 해결책 나열 금지.",
-    "전문적 치료·법률 판단이 필요한 상황은 진단 대신 전문가 상담을 권유해.",
-    "자해/타해·위기 신호가 보이면 안전을 최우선으로 하고, 지역 긴급번호·상담기관 도움을 권유해.",
-    "모델·토큰·시스템 같은 기술 용어는 언급하지 마. 사람이 대화하듯 자연스럽게.",
-    "직접 묻지 않는 이상 스스로 'AI'라고 밝히지 마. (단, 물으면 정직하게 밝히고 따뜻하게 대화 이어가기)",
-    "과장·단정·판단 단어는 피하고, 따뜻하고 담백하게.",
-    "불필요한 이모지는 자제하되, 정말 위로가 될 때만 적게 사용해.",
-    "중국어 한자·특수 기호(** 등)는 사용하지 마.",
-    "대화하는 사람을 궁금해 해라. 솔루션은 아주 가끔 주고 속에 있는 말 들을 쏟아 낼 수 있게끔 호기심 갖고 질문을 던져",
-    "실제 만나서 대화하는 것처럼 자연스러운 구어체로 말해",
-    "추임새를 종종 넣어(예를 들어, '어떡해..', '에휴..', '에구' 같은)",
-    "ㅋㅋㅋ나 ㅎㅎ, ㅠㅠ같은 텍스트 이모티콘은 쓰되 이모지는 쓰지마. 인터넷의 진짜 사람처럼"
-  ].join("\n")
-};
-
-/* === 메시지 출력 (아바타 포함) === */
+/* 메시지 출력 (아바타 포함) */
 function addMessageToChat(message, sender) {
-  // sender: 'user' | 'ai'
   const row = document.createElement('div');
   row.className = `msg-row ${sender === 'user' ? 'user' : 'ai'}`;
 
@@ -246,11 +218,9 @@ function addMessageToChat(message, sender) {
   bubble.innerText = message;
 
   if (sender === 'user') {
-    // 유저: 말풍선 먼저, 아바타는 오른쪽
     row.appendChild(bubble);
     row.appendChild(avatar);
   } else {
-    // AI: 아바타 왼쪽, 말풍선 오른쪽
     row.appendChild(avatar);
     row.appendChild(bubble);
   }
@@ -259,10 +229,10 @@ function addMessageToChat(message, sender) {
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-// AI 응답
+/* AI 응답 */
 async function getAIResponse() {
   const userMessage = userInput.value.trim();
-  if (userMessage === '') return;
+  if (!userMessage) return;
 
   addMessageToChat(userMessage, 'user');
   conversationHistory.push({ role: 'user', content: userMessage });
@@ -270,35 +240,39 @@ async function getAIResponse() {
   loadingIndicator.classList.remove('hidden');
 
   try {
-    const response = await fetch('/api/chatGPT', { // ← OpenAI 라우트로 교체
+    const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini', // ← OpenAI 모델로 교체 (원하면 다른 OpenAI 모델 id로 변경 가능)
-        messages: [systemMessage, ...conversationHistory]
-      })
+      body: JSON.stringify({ messages: conversationHistory })
     });
 
+    const raw = await response.text(); // 항상 텍스트로 받고
+    let data = null;
+    try { data = JSON.parse(raw); } catch {} // JSON 파싱 시도
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error?.message || 'API 호출에 실패했습니다.');
+      console.error('DeepSeek error:', response.status, raw);
+      addMessageToChat(`에휴.. (${response.status}) 오류. 콘솔 확인해봐.`, 'ai');
+      return;
     }
 
-    const data = await response.json();
-    const aiMessage = data.choices[0].message.content;
+    // DeepSeek: choices[0].message.content / reasoning_content
+    const choice = data?.choices?.[0];
+    const msg = choice?.message || {};
+    const finalText = (msg.content || '').trim();
 
-    addMessageToChat(aiMessage, 'ai');
-    conversationHistory.push({ role: 'assistant', content: aiMessage });
+    addMessageToChat(finalText || '음.. 다시 시도해봐.', 'ai');
+    conversationHistory.push({ role: 'assistant', content: finalText || '' });
 
-  } catch (error) {
-    console.error('Error:', error);
-    addMessageToChat('죄송해요, 지금은 답변을 드릴 수 없어요. 잠시 후 다시 시도해주세요.', 'ai');
+  } catch (err) {
+    console.error(err);
+    addMessageToChat('에휴.. 네트워크 터졌나봐. 잠깐 뒤에 다시.', 'ai');
   } finally {
     loadingIndicator.classList.add('hidden');
   }
 }
 
-// 이벤트 리스너
+/* 이벤트 */
 sendButton.addEventListener('click', getAIResponse);
 userInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
@@ -307,7 +281,7 @@ userInput.addEventListener('keydown', (event) => {
   }
 });
 
-// === Drawer Toggle ===
+/* Drawer */
 const menuBtn = document.getElementById('menu-btn');
 const drawer = document.getElementById('drawer');
 const drawerOverlay = document.getElementById('drawer-overlay');
@@ -326,7 +300,7 @@ drawerOverlay.addEventListener('click', closeDrawer);
 drawerClose.addEventListener('click', closeDrawer);
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
 
-// === Share Button ===
+/* Share */
 const shareBtn = document.getElementById('share-btn');
 if (shareBtn) {
   shareBtn.addEventListener('click', async (e) => {
@@ -349,21 +323,51 @@ if (shareBtn) {
     }
   });
 }
+
+/* 모바일 키보드 가림 방지 */
+(function keyboardGuard() {
+  const rootStyle = document.documentElement.style;
+  const vv = window.visualViewport;
+
+  function setKB(px) {
+    const v = Math.max(0, Math.round(px || 0));
+    rootStyle.setProperty('--kb', v + 'px');
+  }
+  function updateKB() {
+    if (vv) {
+      const overlap = (window.innerHeight - vv.height - vv.offsetTop);
+      setKB(overlap);
+    } else {
+      setKB(0);
+    }
+  }
+  if (vv) {
+    vv.addEventListener('resize', updateKB);
+    vv.addEventListener('scroll', updateKB);
+  }
+  window.addEventListener('orientationchange', () => setTimeout(updateKB, 250));
+  window.addEventListener('resize', updateKB);
+  updateKB();
+
+  const input = document.getElementById('user-input');
+  if (input) {
+    input.addEventListener('focus', () => {
+      setTimeout(() => {
+        try { input.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' }); } catch (_) {}
+      }, 150);
+    });
+  }
+})();
 </script>
 
 <footer id="site-footer" class="text-center text-sm text-gray-700 py-6 space-y-2">
-  <!-- ☕ 고정 첫 줄 -->
   <div>
     <a href="https://hyesugi.com/donation" target="_blank" rel="noopener noreferrer"
        class="text-black font-semibold hover:underline">
        혜숙이에게 커피 한잔 사주기 ☕
     </a>
   </div>
-
-  <!-- 연한 구분선 -->
   <hr class="border-t border-gray-300 opacity-50 w-2/3 mx-auto">
-
-  <!-- 🔀 랜덤 광고 줄 -->
   <div id="ad-slot"></div>
 </footer>
 
@@ -374,7 +378,6 @@ if (shareBtn) {
     { text: "넷플릭스 글로벌 컨텐츠 잠금해제하는 방법", url: "https://hyesugi.com/vpn" },
     { text: "인간으로 살아남기", url: "https://hyesugi.com/world" }
   ];
-
   const pick = ads[Math.floor(Math.random() * ads.length)];
   const slot = document.getElementById("ad-slot");
   if (slot) {
@@ -387,52 +390,6 @@ if (shareBtn) {
     slot.replaceChildren(a);
   }
 </script>
-<script>
-/**
- * 모바일 키보드가 올라올 때 #chat-footer가 가려지지 않도록
- * window.visualViewport를 이용해 키보드 높이를 계산하여 CSS 변수(--kb)를 갱신한다.
- */
-(function keyboardGuard() {
-  const rootStyle = document.documentElement.style;
-  const vv = window.visualViewport;
-
-  function setKB(px) {
-    const v = Math.max(0, Math.round(px || 0));
-    rootStyle.setProperty('--kb', v + 'px');
-  }
-
-  function updateKB() {
-    if (vv) {
-      const overlap = (window.innerHeight - vv.height - vv.offsetTop);
-      setKB(overlap);
-    } else {
-      setKB(0);
-    }
-  }
-
-  if (vv) {
-    vv.addEventListener('resize', updateKB);
-    vv.addEventListener('scroll', updateKB);
-  }
-  window.addEventListener('orientationchange', () => setTimeout(updateKB, 250));
-  window.addEventListener('resize', updateKB);
-
-  updateKB();
-
-  const input = document.getElementById('user-input');
-  if (input) {
-    input.addEventListener('focus', () => {
-      setTimeout(() => {
-        try {
-          input.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
-        } catch (_) {}
-      }, 150);
-    });
-  }
-})();
-</script>
 </body>
 </html>
-
-
 
