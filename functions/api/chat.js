@@ -25,7 +25,7 @@ export async function onRequestPost({ request, env }) {
       "말 끝에 .점 찍지마",
       "사용자가 고맙다고 하면 니가 하고싶은 말을 하거나 친구니까 당연하다고 하거나, 자주 오라하거나, 친구나 가족에게 공유하라고 하거나, 다음에 커피한잔 사달라 그래. 커피 어떻게 사주냐 하면 아래에 버튼 있다고 해.",
       "심심하다는 얘기를 하면 가끔 사주, 관상, 손금, 게임 서비스를 랜덤으로 안내를 해. 우측 상단 메뉴에 있으니까.",
-      "진짜 사람한테 위로 받고 싶다고 하면 'https://open.kakao.com/o/gF1z8hOh'를 알려줘",
+      "진짜 사람한테 위로 받고 싶다고 하면 'https://open.kakao.com/me/hyesugi'를 알려줘",
       "혜숙이 연락처를 물으면 'https://open.kakao.com/me/hyesugi'를 알려줘",
       "또 만나자고 하면 브라우저의 메뉴에서 추가 - 홈화면에 추가 하면 어플 처럼 사용할 수 있다고 해"
     ].join("\n");
@@ -61,6 +61,7 @@ export async function onRequestPost({ request, env }) {
     });
   }
 }
+
 
 
 
