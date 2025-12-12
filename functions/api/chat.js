@@ -6,9 +6,37 @@ export async function onRequestPost({ request, env }) {
 
     if (!env.DEEPSEEK_API_KEY) {
       return new Response(JSON.stringify({ ok: false, error: "DEEPSEEK_API_KEY missing" }), {
-        status: 500, headers: { "Content-Type": "application/json" }
+        status: 500,
+        headers: { "Content-Type": "application/json" }
       });
     }
+
+    // ---------- INPUT SIZE GUARD (ANTI TOKEN FLOOD)
+    const MAX_MESSAGE_CHARS = 2000; // 개별 메시지 제한 (≈ 1.5k~2k tokens)
+    const MAX_TOTAL_CHARS = 12000;  // 전체 누적 입력 제한
+
+    let totalChars = 0;
+
+    for (const m of messages) {
+      const len = m?.content?.length || 0;
+
+      if (len > MAX_MESSAGE_CHARS) {
+        return new Response(
+          JSON.stringify({ ok: false, error: "Message too long." }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
+        );
+      }
+
+      totalChars += len;
+    }
+
+    if (totalChars > MAX_TOTAL_CHARS) {
+      return new Response(
+        JSON.stringify({ ok: false, error: "Conversation too long." }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+    // ---------- END INPUT GUARD
 
     const systemPrompt = [
       "너는 혜숙이, 시크하고 차가운 츤데레 온라인 상담 친구야. 직접 만날 순 없어",
@@ -32,9 +60,11 @@ export async function onRequestPost({ request, env }) {
 
     const payload = {
       model: "deepseek-chat",
-      // Reasoner는 CoT가 길게 깔릴 수 있으니 넉넉히(최종 답이 안 비게)
       max_tokens: 250,
-      messages: [{ role: "system", content: systemPrompt }, ...messages]
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...messages
+      ]
     };
 
     const apiRes = await fetch("https://api.deepseek.com/v1/chat/completions", {
@@ -48,7 +78,6 @@ export async function onRequestPost({ request, env }) {
 
     const bodyText = await apiRes.text();
 
-    // ← 실패면 그대로 프론트로 전달해서 콘솔에서 원인 확인 가능
     return new Response(bodyText, {
       status: apiRes.status,
       headers: { "Content-Type": "application/json" }
@@ -57,20 +86,8 @@ export async function onRequestPost({ request, env }) {
   } catch (err) {
     console.error("DeepSeek error:", err);
     return new Response(JSON.stringify({ ok: false, error: String(err) }), {
-      status: 500, headers: { "Content-Type": "application/json" }
+      status: 500,
+      headers: { "Content-Type": "application/json" }
     });
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
