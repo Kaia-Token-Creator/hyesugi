@@ -59,7 +59,7 @@ export async function onRequestPost({ request, env }) {
     ].join("\n");
 
     const payload = {
-      model: "deepseek-reasoner",
+      model: "deepseek-chat",
       max_tokens: 250,
       messages: [
         { role: "system", content: systemPrompt },
@@ -91,5 +91,6 @@ export async function onRequestPost({ request, env }) {
     });
   }
 }
+
 
 
